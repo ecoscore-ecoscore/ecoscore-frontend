@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Setor — EcoScore</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/config.js"></script>
+  <style>
+    .status-badge { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1.25rem; border-radius: 100px; font-weight: 700; font-size: 0.9rem; }
+    .status-liberado { background: rgba(76,175,80,0.15); border: 1.5px solid var(--green-500); color: var(--green-400); }
+    .status-bloqueado { background: rgba(244,67,54,0.12); border: 1.5px solid rgba(244,67,54,0.4); color: #ef5350; }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.5s ease-in-out infinite; }
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .action-card { padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); text-align: center; text-decoration: none; color: inherit; transition: var(--transition); cursor: pointer; }
+    .action-card:hover { border-color: var(--green-500); transform: translateY(-3px); box-shadow: var(--glow); color: inherit; }
+    .action-icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+    .action-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+    .action-desc { font-size: 0.8rem; color: var(--text-dim); }
+    .coleta-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: var(--dark-2); border-radius: var(--radius); border: 1px solid var(--border); }
+    .material-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot-metal { background: var(--gold); }
+    .dot-vidro { background: #42A5F5; }
+    .dot-plastico { background: #66BB6A; }
+    .dot-papel { background: #FFA726; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/portal.html" class="navbar-brand">
+    <span class="logo-icon">🌿</span>
+    <div>
+      <span class="logo-text">EcoScore</span>
+      <span class="logo-sub">Gestão Sustentável de Resíduos</span>
+    </div>
+  </a>
+  <ul class="navbar-nav">
+    <li><a href="dashboard.html" class="active">Painel</a></li>
+    <li><a href="registro.html">Registrar</a></li>
+    <li><a href="ranking.html">Ranking</a></li>
+    <li><a href="recompensas.html">Recompensas</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <span id="navSetor" style="font-size:0.85rem;color:var(--text-muted)"></span>
+    <button onclick="logout()" class="btn btn-secondary btn-sm">Sair</button>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title" id="sectorName">🏢 Carregando...</h1>
+      <p class="page-desc" id="sectorDesc"></p>
+    </div>
+    <div id="statusBadge"></div>
+  </div>
+</div>
+
+<main class="section">
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="grid-4 mb-3" id="statsGrid">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <div><div class="stat-value" id="statColetas">—</div><div class="stat-label">Coletas Hoje</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚖️</span>
+        <div><div class="stat-value" id="statKg">—</div><div class="stat-label">kg Registrados</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🏅</span>
+        <div><div class="stat-value" id="statPontos">—</div><div class="stat-label">Pontos Total</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <div><div class="stat-value" id="statFuncionarios">—</div><div class="stat-label">Funcionários</div></div>
+      </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Ações Rápidas</h2>
+    <div class="quick-actions">
+      <a href="registro.html" class="action-card" id="cardRegistrar">
+        <span class="action-icon">📝</span>
+        <div class="action-title">Registrar Coleta</div>
+        <div class="action-desc">Informe nome, material e peso</div>
+      </a>
+      <a href="ranking.html" class="action-card">
+        <span class="action-icon">🏆</span>
+        <div class="action-title">Ver Ranking</div>
+        <div class="action-desc">Compare com outros setores</div>
+      </a>
+      <a href="recompensas.html" class="action-card">
+        <span class="action-icon">🎁</span>
+        <div class="action-title">Recompensas</div>
+        <div class="action-desc">Troque seus pontos por prêmios</div>
+      </a>
+    </div>
+
+    <!-- Histórico Recente -->
+    <div style="margin-top:2.5rem">
+      <div class="flex-between mb-2">
+        <h2 style="font-size:1.1rem;font-weight:700">Coletas Recentes do Setor</h2>
+        <a href="registro.html" class="btn btn-secondary btn-sm" id="btnNovaColeta">+ Nova Coleta</a>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden" id="historico">
+        <div class="empty-state"><span class="empty-icon">📭</span><p>Nenhuma coleta registrada ainda</p></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const DIAS = ['', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
+  const MATERIAL_ICONS = { metal: '🔩', vidro: '🪟', plastico: '🧴', papel: '📄' };
+  const MATERIAL_DOTS = { metal: 'dot-metal', vidro: 'dot-vidro', plastico: 'dot-plastico', papel: 'dot-papel' };
+
+  async function init() {
+    const me = await apiFetch('/api/me').then(r => r.json());
+    if (!me.logado || me.tipo !== 'setor') { window.location.href = '/login.html'; return; }
+
+    const setor = me.setor;
+    document.getElementById('sectorName').textContent = `🏢 ${setor.nome}`;
+    document.getElementById('sectorDesc').textContent = `Dia de coleta: ${DIAS[setor.dia_semana]}`;
+    document.getElementById('navSetor').textContent = setor.nome;
+
+    const diaHoje = new Date().getDay();
+    const liberado = diaHoje === setor.dia_semana;
+
+    const badge = document.getElementById('statusBadge');
+    if (liberado) {
+      badge.innerHTML = `<div class="status-badge status-liberado"><div class="pulse-dot"></div>Coleta Liberada Hoje!</div>`;
+      document.getElementById('cardRegistrar').style.borderColor = 'var(--green-500)';
+      document.getElementById('cardRegistrar').style.boxShadow = 'var(--glow)';
+    } else {
+      badge.innerHTML = `<div class="status-badge status-bloqueado">🔒 Coleta Indisponível</div>`;
+      const cardReg = document.getElementById('cardRegistrar');
+      cardReg.style.opacity = '0.5';
+      cardReg.style.cursor = 'not-allowed';
+      cardReg.removeAttribute('href');
+      cardReg.addEventListener('click', e => { e.preventDefault(); alert(`Registro disponível apenas na ${DIAS[setor.dia_semana]}.`); });
+      document.getElementById('btnNovaColeta').style.opacity = '0.4';
+      document.getElementById('btnNovaColeta').addEventListener('click', e => e.preventDefault());
+    }
+
+    // Carregar coletas
+    try {
+      const coletas = await apiFetch('/api/coletas').then(r => r.json());
+      const hoje = new Date().toISOString().split('T')[0];
+      const coletasHoje = coletas.filter(c => c.data_registro === hoje);
+      const totalKg = coletas.reduce((s, c) => s + c.peso_kg, 0);
+      const totalPontos = coletas.reduce((s, c) => s + c.pontos, 0);
+      const funcionariosUnicos = new Set(coletas.map(c => c.funcionario_nome)).size;
+
+      document.getElementById('statColetas').textContent = coletasHoje.length;
+      document.getElementById('statKg').textContent = totalKg.toFixed(1) + 'kg';
+      document.getElementById('statPontos').textContent = totalPontos.toLocaleString();
+      document.getElementById('statFuncionarios').textContent = funcionariosUnicos;
+
+      if (coletas.length > 0) {
+        const recent = coletas.slice(0, 8);
+        document.getElementById('historico').innerHTML = `
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem">
+            ${recent.map(c => `
+              <div class="coleta-item">
+                <div class="material-dot ${MATERIAL_DOTS[c.tipo_material] || ''}"></div>
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:0.9rem">${c.funcionario_nome}</div>
+                  <div style="font-size:0.78rem;color:var(--text-dim)">${MATERIAL_ICONS[c.tipo_material] || ''} ${c.tipo_material} · ${c.data_registro}</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-weight:700;font-size:0.9rem;color:var(--green-400)">${c.peso_kg}kg</div>
+                  <div style="font-size:0.75rem;color:var(--gold)">+${c.pontos} pts</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+      }
+    } catch {}
+  }
+
+  async function logout() {
+    await apiFetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/login.html';
+  }
+
+  init();
+</script>
+</body>
+</html>

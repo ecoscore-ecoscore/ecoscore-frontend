@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — EcoScore</title>
+  <meta name="description" content="Acesse o sistema EcoScore com suas credenciais.">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/config.js"></script>
+  <style>
+    body { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 2rem 1rem; 
+      background: radial-gradient(ellipse at 30% 70%, rgba(76,175,80,0.12) 0%, transparent 60%), var(--dark); 
+    }
+    .login-box { width: 100%; max-width: 420px; animation: slideUp 0.4s ease; }
+    .login-logo { text-align: center; margin-bottom: 2rem; }
+    .login-logo .emoji { font-size: 3.5rem; display: block; margin-bottom: 0.5rem; }
+    .login-logo h1 { font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, var(--green-400), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .login-logo p { color: var(--text-muted); font-size: 0.9rem; }
+    
+    .bloqueio-box { display: none; padding: 1.5rem; text-align: center; }
+    .bloqueio-box .lock-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    
+    .back-btn { display: block; text-align: center; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; margin-top: 1.5rem; transition: var(--transition); }
+    .back-btn:hover { color: var(--green-400); }
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="login-logo">
+    <span class="emoji">🌿</span>
+    <h1>EcoScore</h1>
+    <p>Gestão Sustentável de Resíduos</p>
+  </div>
+
+  <div class="card card-glass animate-slide">
+    <!-- Alerta de erro/info -->
+    <div id="alertBox" style="display:none;margin-bottom:1.5rem"></div>
+
+    <!-- Form Único -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label" for="loginInput">E-mail ou Usuário</label>
+        <input id="loginInput" class="form-control" type="text" placeholder="seu@email.com ou login" required autofocus>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="senhaInput">Sua Senha</label>
+        <input id="senhaInput" class="form-control" type="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="btnSubmit">
+        <span>🔑 Acessar Sistema</span>
+      </button>
+    </form>
+
+    <!-- Tela de bloqueio -->
+    <div id="bloqueioBox" class="bloqueio-box">
+      <div class="lock-icon">🔒</div>
+      <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:0.5rem">Acesso Restrito</h3>
+      <p class="text-muted" style="font-size:0.95rem" id="bloqueioMsg"></p>
+      <div id="bloqueioDetalhes" style="margin-top:1.5rem"></div>
+      <button onclick="resetarBloqueio()" class="btn btn-secondary btn-full mt-3">↩ Voltar</button>
+    </div>
+  </div>
+
+  <a href="/" class="back-btn">← Voltar à Página Inicial</a>
+</div>
+
+<script>
+  function showAlert(msg, tipo = 'error') {
+    const box = document.getElementById('alertBox');
+    const clsMap = { error: 'alert-error', warning: 'alert-warning', success: 'alert-success', info: 'alert-info' };
+    const iconMap = { error: '❌', warning: '⚠️', success: '✅', info: 'ℹ️' };
+    box.innerHTML = `<div class="alert ${clsMap[tipo]}">${iconMap[tipo]} ${msg}</div>`;
+    box.style.display = 'block';
+  }
+
+  function setLoading(loading) {
+    const btn = document.getElementById('btnSubmit');
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Verificando...';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '<span>🔑 Acessar Sistema</span>';
+    }
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const login = document.getElementById('loginInput').value;
+    const senha = document.getElementById('senhaInput').value;
+    
+    setLoading(true);
+    document.getElementById('alertBox').style.display = 'none';
+
+    try {
+      const res = await apiFetch('/api/auth/login', {
+        method: 'POST',
+        body: { login, senha }
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        window.location.href = data.redirecionar || '/';
+        return;
+      }
+
+      if (data.erro === 'acesso_bloqueado') {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('bloqueioBox').style.display = 'block';
+        document.getElementById('bloqueioMsg').textContent = data.mensagem;
+        document.getElementById('bloqueioDetalhes').innerHTML = `
+          <div class="alert alert-info" style="text-align:left; flex-direction: column; align-items: flex-start;">
+            <div>📅 Hoje: <strong>${data.diaAtual}</strong></div>
+            <div style="margin-top:0.4rem">🗓️ Seu dia de coleta: <strong>${data.diaColeta}</strong></div>
+          </div>`;
+      } else {
+        showAlert(data.erro || 'Credenciais inválidas', 'error');
+      }
+    } catch (err) {
+      showAlert('Erro de conexão com o servidor.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function resetarBloqueio() {
+    document.getElementById('bloqueioBox').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('senhaInput').value = '';
+    document.getElementById('alertBox').style.display = 'none';
+  }
+
+  // Verificar se já está logado
+  fetch('/api/me').then(r => r.json()).then(data => {
+    if (data.logado) {
+      if (data.tipo === 'admin') window.location.href = '/admin.html';
+      else if (data.tipo === 'funcionario') window.location.href = '/user.html';
+      else window.location.href = '/dashboard.html';
+    }
+  });
+</script>
+</body>
+</html>
