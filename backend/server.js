@@ -10,25 +10,39 @@ require("./database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Debug
+console.log("🔧 NODE_ENV:", process.env.NODE_ENV);
+console.log("🔧 FRONTEND_URL:", process.env.FRONTEND_URL);
+
 // ─── Middlewares ──────────────────────────────────────────────────────────────
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [process.env.FRONTEND_URL]
-    : [
-        "http://localhost:5000",
-        "http://localhost:3000",
-        "http://127.0.0.1:5000",
-        "http://127.0.0.1:3000",
-      ];
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5000",
+  "http://localhost:3000",
+  "http://127.0.0.1:5000",
+  "http://127.0.0.1:3000",
+  "https://ecoscore-gold.vercel.app",
+].filter(Boolean);
 
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   }),
 );
+
+// Adicionar headers CORS manualmente como fallback
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
