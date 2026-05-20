@@ -1,10 +1,10 @@
 // Configuração global da API
 // Sempre usar o backend no Vercel
-const API_URL = "https://ecoscore-backend.vercel.app";
+window.API_URL = "https://ecoscore-backend.vercel.app";
 
 // Helper para fetch com credenciais e parsing automático
-async function apiFetch(endpoint, options = {}) {
-  const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
+window.apiFetch = async function apiFetch(endpoint, options = {}) {
+  const url = endpoint.startsWith("http") ? endpoint : `${window.API_URL}${endpoint}`;
 
   options.credentials = "include"; // Garante o envio de cookies/sessão
 
