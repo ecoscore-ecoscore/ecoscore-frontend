@@ -1,146 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EcoScore — Transforme a Reciclagem na sua Empresa</title>
-  <meta name="description" content="Sistema corporativo de gestão de resíduos recicláveis. Pense global, aja local e recompense o engajamento sustentável.">
-  <link rel="stylesheet" href="/css/style.css">
-  <script src="/js/config.js"></script>
-  <style>
-    /* Estilos específicos para a Landing Page (Marketing) */
-    .hero-lp {
-      background: linear-gradient(135deg, var(--dark) 0%, var(--green-900) 100%);
-      padding: 6rem 2rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-lp::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 100%, rgba(76,175,80,0.1) 0%, transparent 70%);
-    }
-    .nav-lp {
-      background: rgba(13, 31, 15, 0.8);
-      backdrop-filter: blur(10px);
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; height: 70px; border-bottom: 1px solid var(--border);
-    }
-    .cta-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
-    .feature-icon-lg { font-size: 3.5rem; margin-bottom: 1.5rem; display: block; }
-    .section-dark { background: var(--dark-2); padding: 5rem 2rem; }
-  </style>
-</head>
-<body>
-
-<!-- Navbar Marketing -->
-<nav class="nav-lp">
-  <a href="/" class="navbar-brand">
-    <span class="logo-icon">🌿</span>
-    <span class="logo-text">EcoScore</span>
-  </a>
-  <div style="display: flex; gap: 1.5rem; align-items: center;">
-    <a href="login.html" class="btn btn-secondary btn-sm">🔑 Entrar</a>
-    <a href="cadastro-empresa.html" class="btn btn-primary btn-sm">🚀 Começar Agora</a>
-  </div>
-</nav>
-
-<!-- Hero Section -->
-<section class="hero-lp">
-  <div class="container">
-    <h1 class="hero-title animate-slide">Sustentabilidade que <span class="highlight">Gera Valor</span></h1>
-    <p class="hero-subtitle">A plataforma completa para engajamento e gestão de resíduos recicláveis feita para empresas de todos os tamanhos.</p>
-    <div class="cta-buttons">
-      <a href="cadastro-empresa.html" class="btn btn-primary btn-lg">🚀 Cadastrar Minha Empresa</a>
-      <a href="login.html" class="btn btn-secondary btn-lg">Entrar no Portal</a>
-    </div>
-  </div>
-</section>
-
-<!-- Benefícios -->
-<section class="section">
-  <div class="container">
-    <div class="text-center mb-3">
-      <h2 class="section-title">Por que escolher o EcoScore?</h2>
-      <p class="section-sub">Unimos tecnologia e gamificação para transformar o hábito de reciclar.</p>
-    </div>
-    <div class="grid-3">
-      <div class="feature-card">
-        <span class="feature-icon-lg">📊</span>
-        <h3 class="feature-title">Dados em Tempo Real</h3>
-        <p class="feature-desc">Visualize kg coletados, impacto ambiental e emissão de CO2 evitada por cada setor da sua empresa.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon-lg">🏆</span>
-        <h3 class="feature-title">Engajamento Gamificado</h3>
-        <p class="feature-desc">Crie uma competição saudável entre setores e recompense os colaboradores mais engajados.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon-lg">🏢</span>
-        <h3 class="feature-title">Multi-Empresa</h3>
-        <p class="feature-desc">Ambiente isolado e seguro para cada corporação, com gestão independente de setores e regras.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Como Funciona -->
-<section class="section-dark">
-  <div class="container">
-    <div class="text-center mb-3">
-      <h2 class="section-title">Como funciona na prática?</h2>
-    </div>
-    <div class="grid-4">
-      <div class="text-center">
-        <div style="font-size: 2.5rem; font-weight: 900; color: var(--green-400);">01</div>
-        <h4 class="mt-1">Cadastre-se</h4>
-        <p class="text-dim" style="font-size:0.85rem">Crie a conta da sua empresa em segundos e acesse o painel admin.</p>
-      </div>
-      <div class="text-center">
-        <div style="font-size: 2.5rem; font-weight: 900; color: var(--green-400);">02</div>
-        <h4 class="mt-1">Configure</h4>
-        <p class="text-dim" style="font-size:0.85rem">Defina seus setores, funcionários e os dias de coleta de cada um.</p>
-      </div>
-      <div class="text-center">
-        <div style="font-size: 2.5rem; font-weight: 900; color: var(--green-400);">03</div>
-        <h4 class="mt-1">Recicle</h4>
-        <p class="text-dim" style="font-size:0.85rem">Seus colaboradores pesam e registram os resíduos via portal unificado.</p>
-      </div>
-      <div class="text-center">
-        <div style="font-size: 2.5rem; font-weight: 900; color: var(--green-400);">04</div>
-        <h4 class="mt-1">Recompense</h4>
-        <p class="text-dim" style="font-size:0.85rem">Converta pontos em prêmios reais para sua equipe.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-brand">🌿 EcoScore</div>
-    <p>Incentivando a economia circular dentro das corporações.</p>
-    <div class="mt-2" style="font-size: 0.75rem; color: var(--text-dim);">
-      &copy; 2026 EcoScore — Gestão Sustentável de Resíduos. Todos os direitos reservados.
-    </div>
-  </div>
-</footer>
-
-<script>
-  // Script simples para redirecionar se já estiver logado
-  apiFetch('/api/me').then(r => r.json()).then(data => {
-    if (data.logado) {
-      const btn = document.querySelector('.cta-buttons .btn-secondary');
-      if (btn) {
-        btn.innerHTML = '📂 Acessar Meu Painel';
-        const rotas = { admin: '/admin.html', setor: '/dashboard.html', funcionario: '/user.html', super: '/super-admin.html' };
-        btn.href = rotas[data.tipo] || '/';
-        btn.classList.replace('btn-secondary', 'btn-gold');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoScore — Transforme a Reciclagem na sua Empresa</title>
+    <meta
+      name="description"
+      content="Sistema corporativo de gestão de resíduos recicláveis. Pense global, aja local e recompense o engajamento sustentável."
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="/js/config.js"></script>
+    <style>
+      /* Estilos específicos para a Landing Page (Marketing) */
+      .hero-lp {
+        background: linear-gradient(
+          135deg,
+          var(--dark) 0%,
+          var(--green-900) 100%
+        );
+        padding: 6rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
       }
-    }
-  });
-</script>
+      .hero-lp::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 100%,
+          rgba(76, 175, 80, 0.1) 0%,
+          transparent 70%
+        );
+      }
+      .nav-lp {
+        background: rgba(13, 31, 15, 0.8);
+        backdrop-filter: blur(10px);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+        height: 70px;
+        border-bottom: 1px solid var(--border);
+      }
+      .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .feature-icon-lg {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        display: block;
+      }
+      .section-dark {
+        background: var(--dark-2);
+        padding: 5rem 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar Marketing -->
+    <nav class="nav-lp">
+      <a href="/" class="navbar-brand">
+        <span class="logo-icon">🌿</span>
+        <span class="logo-text">EcoScore</span>
+      </a>
+      <div style="display: flex; gap: 1.5rem; align-items: center">
+        <a href="login.html" class="btn btn-secondary btn-sm">🔑 Entrar</a>
+        <a href="cadastro-empresa.html" class="btn btn-primary btn-sm"
+          >🚀 Começar Agora</a
+        >
+      </div>
+    </nav>
 
-</body>
+    <!-- Hero Section -->
+    <section class="hero-lp">
+      <div class="container">
+        <h1 class="hero-title animate-slide">
+          Sustentabilidade que <span class="highlight">Gera Valor</span>
+        </h1>
+        <p class="hero-subtitle">
+          A plataforma completa para engajamento e gestão de resíduos
+          recicláveis feita para empresas de todos os tamanhos.
+        </p>
+        <div class="cta-buttons">
+          <a href="cadastro-empresa.html" class="btn btn-primary btn-lg"
+            >🚀 Cadastrar Minha Empresa</a
+          >
+          <a href="login.html" class="btn btn-secondary btn-lg"
+            >Entrar no Portal</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="section">
+      <div class="container">
+        <div class="text-center mb-3">
+          <h2 class="section-title">Por que escolher o EcoScore?</h2>
+          <p class="section-sub">
+            Unimos tecnologia e gamificação para transformar o hábito de
+            reciclar.
+          </p>
+        </div>
+        <div class="grid-3">
+          <div class="feature-card">
+            <span class="feature-icon-lg">📊</span>
+            <h3 class="feature-title">Dados em Tempo Real</h3>
+            <p class="feature-desc">
+              Visualize kg coletados, impacto ambiental e emissão de CO2 evitada
+              por cada setor da sua empresa.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon-lg">🏆</span>
+            <h3 class="feature-title">Engajamento Gamificado</h3>
+            <p class="feature-desc">
+              Crie uma competição saudável entre setores e recompense os
+              colaboradores mais engajados.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon-lg">🏢</span>
+            <h3 class="feature-title">Multi-Empresa</h3>
+            <p class="feature-desc">
+              Ambiente isolado e seguro para cada corporação, com gestão
+              independente de setores e regras.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Como Funciona -->
+    <section class="section-dark">
+      <div class="container">
+        <div class="text-center mb-3">
+          <h2 class="section-title">Como funciona na prática?</h2>
+        </div>
+        <div class="grid-4">
+          <div class="text-center">
+            <div
+              style="
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: var(--green-400);
+              "
+            >
+              01
+            </div>
+            <h4 class="mt-1">Cadastre-se</h4>
+            <p class="text-dim" style="font-size: 0.85rem">
+              Crie a conta da sua empresa em segundos e acesse o painel admin.
+            </p>
+          </div>
+          <div class="text-center">
+            <div
+              style="
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: var(--green-400);
+              "
+            >
+              02
+            </div>
+            <h4 class="mt-1">Configure</h4>
+            <p class="text-dim" style="font-size: 0.85rem">
+              Defina seus setores, funcionários e os dias de coleta de cada um.
+            </p>
+          </div>
+          <div class="text-center">
+            <div
+              style="
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: var(--green-400);
+              "
+            >
+              03
+            </div>
+            <h4 class="mt-1">Recicle</h4>
+            <p class="text-dim" style="font-size: 0.85rem">
+              Seus colaboradores pesam e registram os resíduos via portal
+              unificado.
+            </p>
+          </div>
+          <div class="text-center">
+            <div
+              style="
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: var(--green-400);
+              "
+            >
+              04
+            </div>
+            <h4 class="mt-1">Recompense</h4>
+            <p class="text-dim" style="font-size: 0.85rem">
+              Converta pontos em prêmios reais para sua equipe.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-brand">🌿 EcoScore</div>
+        <p>Incentivando a economia circular dentro das corporações.</p>
+        <div class="mt-2" style="font-size: 0.75rem; color: var(--text-dim)">
+          &copy; 2026 EcoScore — Gestão Sustentável de Resíduos. Todos os
+          direitos reservados.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Script simples para redirecionar se já estiver logado
+      apiFetch("/api/me").then((data) => {
+        if (data.logado) {
+          const btn = document.querySelector(".cta-buttons .btn-secondary");
+          if (btn) {
+            btn.innerHTML = "📂 Acessar Meu Painel";
+            const rotas = {
+              admin: "/admin.html",
+              setor: "/dashboard.html",
+              funcionario: "/user.html",
+              super: "/super-admin.html",
+            };
+            btn.href = rotas[data.tipo] || "/";
+            btn.classList.replace("btn-secondary", "btn-gold");
+          }
+        }
+      });
+    </script>
+  </body>
 </html>
