@@ -51,17 +51,6 @@ const API_URL =
 
 ---
 
-## 🔑 Credenciais de Teste
-
-| Tipo          | Usuário                 | Senha            |
-| ------------- | ----------------------- | ---------------- |
-| Empresa/Admin | `ecoscore994@gmail.com` | `ecoscoreadmin`  |
-| Setor         | `marketing`             | `ecoscore123`    |
-| Funcionário   | `ana@demo.com`          | `funcionario123` |
-| Super Admin   | `eco_master`            | `eco123`         |
-
----
-
 ## 🌐 Deploy na Vercel
 
 1. **Conectar repositório:**
@@ -140,7 +129,7 @@ async function apiFetch(endpoint, options = {}) {
 // Fazer login
 const res = await apiFetch("/api/auth/login", {
   method: "POST",
-  body: { login: "ecoscore994@gmail.com", senha: "ecoscoreadmin" },
+  body: { login: "email@empresa.com", senha: "senha" },
 });
 
 const data = res.json ? await res.json() : res;
