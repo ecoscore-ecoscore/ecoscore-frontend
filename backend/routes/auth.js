@@ -202,4 +202,93 @@ router.get("/test-credentials", (req, res) => {
   });
 });
 
+// GET /api/auth/status — Verificar status do banco e criar seed se necessário
+router.get("/status", async (req, res) => {
+  try {
+    const {
+      Empresa,
+      Admin,
+      Setor,
+      Funcionario,
+      Recompensa,
+    } = require("../database");
+
+    const empresaCount = await Empresa.countDocuments();
+    const adminCount = await Admin.countDocuments();
+    const setorCount = await Setor.countDocuments();
+
+    if (empresaCount === 0) {
+      console.log("🔄 Seed manual iniciado...");
+
+      const senhaEmpresa = bcrypt.hashSync("demo123", 10);
+      const empresa = await Empresa.create({
+        nome: "Empresa Demo",
+        email: "demo@ecoscore.com",
+        senha: senhaEmpresa,
+      });
+
+      const senhaSuperAdmin = bcrypt.hashSync("eco123", 10);
+      await Admin.create({
+        usuario: "eco_master",
+        senha: senhaSuperAdmin,
+        empresa_id: null,
+      });
+
+      const senhaAdmin = bcrypt.hashSync("admin123", 10);
+      await Admin.create({
+        usuario: "admin",
+        senha: senhaAdmin,
+        empresa_id: empresa._id,
+      });
+
+      const senhaSetor = bcrypt.hashSync("ecoscore123", 10);
+      const setoresSeed = [
+        {
+          nome: "Marketing",
+          login: "marketing",
+          dia_semana: 1,
+          empresa_id: empresa._id,
+          senha: senhaSetor,
+        },
+        {
+          nome: "RH",
+          login: "rh",
+          dia_semana: 2,
+          empresa_id: empresa._id,
+          senha: senhaSetor,
+        },
+      ];
+      await Setor.insertMany(setoresSeed);
+
+      const senhaFunc = bcrypt.hashSync("funcionario123", 10);
+      const marketing = await Setor.findOne({
+        login: "marketing",
+        empresa_id: empresa._id,
+      });
+      await Funcionario.create({
+        nome: "Ana Silva",
+        email: "ana@demo.com",
+        senha: senhaFunc,
+        setor_id: marketing._id,
+        empresa_id: empresa._id,
+      });
+
+      console.log("✅ Seed manual concluído!");
+    }
+
+    res.json({
+      status: "ok",
+      mongodb_conectado: true,
+      dados: {
+        empresas: empresaCount,
+        admins: adminCount,
+        setores: setorCount,
+      },
+    });
+  } catch (err) {
+    console.error("[STATUS ERROR]", err);
+    res.status(500).json({ status: "erro", erro: err.message });
+  }
+});
+
 module.exports = router;
