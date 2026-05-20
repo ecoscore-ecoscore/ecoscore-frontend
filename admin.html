@@ -78,6 +78,12 @@
           >📊 Relatórios</a
         >
         <a href="ranking.html" class="btn btn-secondary btn-sm">🏆 Ranking</a>
+        <button
+          onclick="abrirModalAlterarSenha()"
+          class="btn btn-secondary btn-sm"
+        >
+          🔒 Alterar Senha
+        </button>
         <button onclick="logout()" class="btn btn-danger btn-sm">Sair</button>
       </div>
     </nav>
@@ -479,6 +485,78 @@
       </div>
     </div>
 
+    <!-- Modal Alterar Senha -->
+    <div
+      id="modalAlterarSenha"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: var(--surface);
+          padding: 2rem;
+          border-radius: 8px;
+          max-width: 400px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h2 style="margin-top: 0; color: var(--text)">🔒 Alterar Senha</h2>
+        <form id="formAlterarSenha" onsubmit="handleAlterarSenha(event)">
+          <div style="margin-bottom: 1rem">
+            <input
+              type="password"
+              id="senhaAtual"
+              class="form-control"
+              placeholder="Senha atual"
+              required
+            />
+          </div>
+          <div style="margin-bottom: 1rem">
+            <input
+              type="password"
+              id="novaSenha"
+              class="form-control"
+              placeholder="Nova senha"
+              required
+            />
+          </div>
+          <div style="margin-bottom: 1.5rem">
+            <input
+              type="password"
+              id="confirmarSenha"
+              class="form-control"
+              placeholder="Confirmar nova senha"
+              required
+            />
+          </div>
+          <div style="display: flex; gap: 0.5rem">
+            <button type="submit" class="btn btn-primary" style="flex: 1">
+              ✅ Alterar Senha
+            </button>
+            <button
+              type="button"
+              onclick="fecharModalAlterarSenha()"
+              class="btn btn-secondary"
+              style="flex: 1"
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       const DIAS_LABEL = {
         1: "Segunda-feira",
@@ -811,6 +889,76 @@
         await apiFetch(`/api/coletas/${id}`, { method: "DELETE" });
         carregarColetas();
         showAlert("✅ Registro excluído.");
+      }
+
+      function abrirModalAlterarSenha() {
+        const modal = document.getElementById("modalAlterarSenha");
+        if (modal) {
+          modal.style.display = "flex";
+          document.getElementById("formAlterarSenha").reset();
+        }
+      }
+
+      function fecharModalAlterarSenha() {
+        const modal = document.getElementById("modalAlterarSenha");
+        if (modal) modal.style.display = "none";
+      }
+
+      async function handleAlterarSenha(e) {
+        e.preventDefault();
+
+        const senhaAtual = document.getElementById("senhaAtual").value;
+        const novaSenha = document.getElementById("novaSenha").value;
+        const confirmarSenha = document.getElementById("confirmarSenha").value;
+        const btn = document.querySelector(
+          '#formAlterarSenha button[type="submit"]',
+        );
+
+        if (!senhaAtual || !novaSenha || !confirmarSenha) {
+          alert("❌ Preencha todos os campos");
+          return;
+        }
+
+        if (novaSenha !== confirmarSenha) {
+          alert("❌ As senhas não conferem");
+          return;
+        }
+
+        if (novaSenha.length < 6) {
+          alert("❌ Senha deve ter no mínimo 6 caracteres");
+          return;
+        }
+
+        try {
+          btn.disabled = true;
+          btn.textContent = "⏳ Alterando...";
+
+          const response = await apiFetch("/api/auth/alterar-senha", {
+            method: "POST",
+            body: { senhaAtual, novaSenha, confirmarSenha },
+          });
+
+          if (response.sucesso) {
+            alert("✅ Senha alterada com sucesso!");
+            fecharModalAlterarSenha();
+          } else {
+            alert(`❌ ${response.erro || "Erro ao alterar senha"}`);
+          }
+        } catch (err) {
+          alert(`❌ ${err.message}`);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "✅ Alterar Senha";
+        }
+      }
+
+      // Fechar modal ao clicar fora
+      if (document.getElementById("modalAlterarSenha")) {
+        document
+          .getElementById("modalAlterarSenha")
+          .addEventListener("click", (e) => {
+            if (e.target.id === "modalAlterarSenha") fecharModalAlterarSenha();
+          });
       }
 
       async function init() {

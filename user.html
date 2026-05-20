@@ -1,205 +1,404 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu EcoPerfil — EcoScore</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <style>
-    .user-header {
-      background: linear-gradient(135deg, var(--dark-2) 0%, var(--green-900) 100%);
-      padding: 4rem 2rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .user-header::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 150%, rgba(76,175,80,0.15) 0%, transparent 70%);
-    }
-    .user-avatar-lg {
-      width: 100px; height: 100px;
-      background: var(--surface);
-      border: 3px solid var(--green-500);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; margin: 0 auto 1.5rem;
-      box-shadow: var(--glow);
-      position: relative; z-index: 1;
-    }
-    .user-meta { position: relative; z-index: 1; }
-    .user-meta h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.25rem; }
-    .user-meta p { color: var(--text-muted); font-size: 1rem; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meu EcoPerfil — EcoScore</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .user-header {
+        background: linear-gradient(
+          135deg,
+          var(--dark-2) 0%,
+          var(--green-900) 100%
+        );
+        padding: 4rem 2rem;
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .user-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 150%,
+          rgba(76, 175, 80, 0.15) 0%,
+          transparent 70%
+        );
+      }
+      .user-avatar-lg {
+        width: 100px;
+        height: 100px;
+        background: var(--surface);
+        border: 3px solid var(--green-500);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 1.5rem;
+        box-shadow: var(--glow);
+        position: relative;
+        z-index: 1;
+      }
+      .user-meta {
+        position: relative;
+        z-index: 1;
+      }
+      .user-meta h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 0.25rem;
+      }
+      .user-meta p {
+        color: var(--text-muted);
+        font-size: 1rem;
+      }
 
-    .user-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      max-width: 600px;
-      margin: -2.5rem auto 2.5rem;
-      padding: 0 1rem;
-      position: relative;
-      z-index: 2;
-    }
-    .u-stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-    .u-stat-val { font-size: 2.2rem; font-weight: 900; color: var(--gold); display: block; line-height: 1; margin-bottom: 0.4rem; }
-    .u-stat-lab { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+      .user-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        max-width: 600px;
+        margin: -2.5rem auto 2.5rem;
+        padding: 0 1rem;
+        position: relative;
+        z-index: 2;
+      }
+      .u-stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--shadow);
+      }
+      .u-stat-val {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: var(--gold);
+        display: block;
+        line-height: 1;
+        margin-bottom: 0.4rem;
+      }
+      .u-stat-lab {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-    .history-section { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 4rem; }
-    .h-item {
-      display: flex; align-items: center; gap: 1.25rem;
-      padding: 1.25rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      margin-bottom: 0.75rem;
-      transition: var(--transition);
-    }
-    .h-item:hover { border-color: var(--green-500); transform: translateX(5px); }
-    .h-icon {
-      width: 54px; height: 54px;
-      background: var(--dark-2);
-      border-radius: var(--radius);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; border: 1px solid var(--border);
-    }
-    .h-info { flex: 1; }
-    .h-title { font-weight: 800; font-size: 1rem; color: var(--text); }
-    .h-date  { font-size: 0.82rem; color: var(--text-dim); }
-    .h-pts   { text-align: right; }
-    .h-pts-val { font-size: 1.1rem; font-weight: 900; color: var(--green-400); display: block; }
-    .h-pts-kg  { font-size: 0.75rem; color: var(--text-dim); }
-  </style>
-</head>
-<body>
+      .history-section {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1.5rem 4rem;
+      }
+      .h-item {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        margin-bottom: 0.75rem;
+        transition: var(--transition);
+      }
+      .h-item:hover {
+        border-color: var(--green-500);
+        transform: translateX(5px);
+      }
+      .h-icon {
+        width: 54px;
+        height: 54px;
+        background: var(--dark-2);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        border: 1px solid var(--border);
+      }
+      .h-info {
+        flex: 1;
+      }
+      .h-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: var(--text);
+      }
+      .h-date {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+      }
+      .h-pts {
+        text-align: right;
+      }
+      .h-pts-val {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: var(--green-400);
+        display: block;
+      }
+      .h-pts-kg {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="/portal.html" class="navbar-brand">
+        <span class="logo-icon">🌿</span>
+        <div>
+          <span class="logo-text">EcoScore</span>
+          <span class="logo-sub">Meu Perfil Sustentável</span>
+        </div>
+      </a>
+      <div class="navbar-actions">
+        <a href="recompensas.html" class="btn btn-gold btn-sm"
+          >🎁 Recompensas</a
+        >
+        <button onclick="logout()" class="btn btn-secondary btn-sm">
+          Sair
+        </button>
+      </div>
+    </nav>
 
-<nav class="navbar">
-  <a href="/portal.html" class="navbar-brand">
-    <span class="logo-icon">🌿</span>
-    <div>
-      <span class="logo-text">EcoScore</span>
-      <span class="logo-sub">Meu Perfil Sustentável</span>
+    <header class="user-header">
+      <div class="user-avatar-lg">👤</div>
+      <div class="user-meta">
+        <h1 id="userName">Carregando...</h1>
+        <p id="userSetor">Setor: —</p>
+      </div>
+    </header>
+
+    <div class="user-stats">
+      <div class="u-stat-card">
+        <span class="u-stat-val" id="totalPontos">0</span>
+        <span class="u-stat-lab">Meus Pontos</span>
+      </div>
+      <div class="u-stat-card">
+        <span class="u-stat-val" id="totalKg">0.0</span>
+        <span class="u-stat-lab">kg Reciclados</span>
+      </div>
     </div>
-  </a>
-  <div class="navbar-actions">
-    <a href="recompensas.html" class="btn btn-gold btn-sm">🎁 Recompensas</a>
-    <button onclick="logout()" class="btn btn-secondary btn-sm">Sair</button>
-  </div>
-</nav>
 
-<header class="user-header">
-  <div class="user-avatar-lg">👤</div>
-  <div class="user-meta">
-    <h1 id="userName">Carregando...</h1>
-    <p id="userSetor">Setor: —</p>
-  </div>
-</header>
-
-<div class="user-stats">
-  <div class="u-stat-card">
-    <span class="u-stat-val" id="totalPontos">0</span>
-    <span class="u-stat-lab">Meus Pontos</span>
-  </div>
-  <div class="u-stat-card">
-    <span class="u-stat-val" id="totalKg">0.0</span>
-    <span class="u-stat-lab">kg Reciclados</span>
-  </div>
-</div>
-
-<main class="history-section">
-  <div class="card mb-4">
-    <h3 class="card-title">📦 Registrar Novo Descarte</h3>
-    <form id="formColeta" class="form-grid">
-      <div class="form-group">
-        <label>Material</label>
-        <select id="tipo_material" class="form-control" required>
-          <option value="">Selecione...</option>
-          <option value="metal">Metal (10 pts/kg)</option>
-          <option value="vidro">Vidro (7 pts/kg)</option>
-          <option value="plastico">Plástico (5 pts/kg)</option>
-          <option value="papel">Papel (3 pts/kg)</option>
-        </select>
+    <main class="history-section">
+      <div class="card mb-4">
+        <h3 class="card-title">📦 Registrar Novo Descarte</h3>
+        <form id="formColeta" class="form-grid">
+          <div class="form-group">
+            <label>Material</label>
+            <select id="tipo_material" class="form-control" required>
+              <option value="">Selecione...</option>
+              <option value="metal">Metal (10 pts/kg)</option>
+              <option value="vidro">Vidro (7 pts/kg)</option>
+              <option value="plastico">Plástico (5 pts/kg)</option>
+              <option value="papel">Papel (3 pts/kg)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Peso (kg)</label>
+            <input
+              type="number"
+              id="peso_kg"
+              step="0.1"
+              min="0.1"
+              class="form-control"
+              placeholder="0.0"
+              required
+            />
+          </div>
+          <div class="form-actions" style="grid-column: span 2">
+            <button type="submit" class="btn btn-primary btn-block">
+              Registrar e Ganhar Pontos
+            </button>
+          </div>
+        </form>
       </div>
-      <div class="form-group">
-        <label>Peso (kg)</label>
-        <input type="number" id="peso_kg" step="0.1" min="0.1" class="form-control" placeholder="0.0" required>
-      </div>
-      <div class="form-actions" style="grid-column: span 2">
-        <button type="submit" class="btn btn-primary btn-block">Registrar e Ganhar Pontos</button>
-      </div>
-    </form>
-  </div>
 
-  <div class="flex-between mb-2">
-    <h2 class="section-title" style="margin-bottom:0">📜 Meu Histórico</h2>
-    <a href="ranking.html" class="btn btn-secondary btn-sm">🏆 Ver Ranking</a>
-  </div>
+      <div class="card mb-4">
+        <h3 class="card-title">⚙️ Configurações</h3>
+        <button
+          onclick="abrirModalAlterarSenha()"
+          class="btn btn-secondary btn-full"
+        >
+          🔒 Alterar Senha
+        </button>
+      </div>
 
-  <div id="historico">
-    <div class="empty-state">
-      <span class="spinner"></span>
-      <p>Carregando seus registros...</p>
+      <div class="flex-between mb-2">
+        <h2 class="section-title" style="margin-bottom: 0">📜 Meu Histórico</h2>
+        <a href="ranking.html" class="btn btn-secondary btn-sm"
+          >🏆 Ver Ranking</a
+        >
+      </div>
+
+      <div id="historico">
+        <div class="empty-state">
+          <span class="spinner"></span>
+          <p>Carregando seus registros...</p>
+        </div>
+      </div>
+
+      <div
+        class="card mt-3 text-center"
+        style="
+          background: rgba(255, 193, 7, 0.05);
+          border-color: rgba(255, 193, 7, 0.2);
+        "
+      >
+        <p class="text-muted mb-2">
+          Continue descartando corretamente para ganhar mais pontos!
+        </p>
+        <a href="recompensas.html" class="btn btn-gold">🎁 Resgatar Prêmios</a>
+      </div>
+    </main>
+
+    <!-- Modal para alterar senha -->
+    <div
+      id="modalAlterarSenha"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 2rem;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: var(--glow);
+        "
+      >
+        <h2 style="margin-bottom: 1.5rem; color: var(--gold)">
+          🔒 Alterar Senha
+        </h2>
+        <form
+          id="formAlterarSenha"
+          onsubmit="handleAlterarSenha(event)"
+          class="form-grid"
+        >
+          <div class="form-group">
+            <label>Senha Atual</label>
+            <input
+              type="password"
+              id="senhaAtual"
+              class="form-control"
+              placeholder="Digite sua senha atual"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Nova Senha</label>
+            <input
+              type="password"
+              id="novaSenha"
+              class="form-control"
+              placeholder="Digite a nova senha (mín. 6 caracteres)"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Confirmar Nova Senha</label>
+            <input
+              type="password"
+              id="confirmarSenha"
+              class="form-control"
+              placeholder="Confirme a nova senha"
+              required
+            />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+            <button type="submit" class="btn btn-primary">
+              ✅ Alterar Senha
+            </button>
+            <button
+              type="button"
+              onclick="fecharModalAlterarSenha()"
+              class="btn btn-secondary"
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <div class="card mt-3 text-center" style="background: rgba(255,193,7,0.05); border-color: rgba(255,193,7,0.2)">
-    <p class="text-muted mb-2">Continue descartando corretamente para ganhar mais pontos!</p>
-    <a href="recompensas.html" class="btn btn-gold">🎁 Resgatar Prêmios</a>
-  </div>
-</main>
+    <script src="/js/config.js"></script>
+    <script>
+      const MATERIAL_ICONS = {
+        metal: "🔩",
+        vidro: "🪟",
+        plastico: "🧴",
+        papel: "📄",
+      };
+      const DIAS = [
+        "",
+        "Segunda-feira",
+        "Terça-feira",
+        "Quarta-feira",
+        "Quinta-feira",
+        "Sexta-feira",
+      ];
 
-<script src="/js/config.js"></script>
-<script>
-  const MATERIAL_ICONS = { metal: '🔩', vidro: '🪟', plastico: '🧴', papel: '📄' };
-  const DIAS = ['', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
+      async function init() {
+        const me = await apiFetch("/api/me").catch(() => ({ logado: false }));
+        if (!me.logado || me.tipo !== "funcionario") {
+          window.location.href = "/login.html";
+          return;
+        }
 
-  async function init() {
-    const me = await apiFetch('/api/me').catch(() => ({ logado: false }));
-    if (!me.logado || me.tipo !== 'funcionario') { 
-      window.location.href = '/login.html'; 
-      return; 
-    }
+        document.getElementById("userName").textContent = me.nome;
+        document.getElementById("userSetor").textContent =
+          `🏢 Setor: ${me.setor_nome || "Não vinculado"} (${DIAS[me.dia_semana] || "Sem dia fixo"})`;
 
-    document.getElementById('userName').textContent = me.nome;
-    document.getElementById('userSetor').textContent = `🏢 Setor: ${me.setor_nome || 'Não vinculado'} (${DIAS[me.dia_semana] || 'Sem dia fixo'})`;
+        // Validar dia de coleta
+        const diaHoje = new Date().getDay();
+        const liberado = diaHoje === me.dia_semana;
+        const form = document.getElementById("formColeta");
+        const btnReg = form.querySelector("button");
 
-    // Validar dia de coleta
-    const diaHoje = new Date().getDay();
-    const liberado = diaHoje === me.dia_semana;
-    const form = document.getElementById('formColeta');
-    const btnReg = form.querySelector('button');
+        if (!liberado) {
+          form.style.opacity = "0.6";
+          form.style.pointerEvents = "none";
+          btnReg.innerHTML = `🔒 Disponível apenas na ${DIAS[me.dia_semana]}`;
+          btnReg.classList.replace("btn-primary", "btn-secondary");
+        }
 
-    if (!liberado) {
-      form.style.opacity = '0.6';
-      form.style.pointerEvents = 'none';
-      btnReg.innerHTML = `🔒 Disponível apenas na ${DIAS[me.dia_semana]}`;
-      btnReg.classList.replace('btn-primary', 'btn-secondary');
-    }
+        // Buscar pontos via ranking
+        const ranking = await apiFetch("/api/ranking/funcionarios");
+        const eu = ranking.find((r) => r.funcionario_nome === me.nome);
 
-    // Buscar pontos via ranking
-    const ranking = await apiFetch('/api/ranking/funcionarios');
-    const eu = ranking.find(r => r.funcionario_nome === me.nome);
+        if (eu) {
+          document.getElementById("totalPontos").textContent =
+            eu.total_pontos.toLocaleString();
+          document.getElementById("totalKg").textContent =
+            eu.total_kg.toFixed(1);
+        }
 
-    if (eu) {
-      document.getElementById('totalPontos').textContent = eu.total_pontos.toLocaleString();
-      document.getElementById('totalKg').textContent = eu.total_kg.toFixed(1);
-    }
-
-    // Buscar histórico
-    try {
-      const coletas = await apiFetch('/api/coletas');
-      if (coletas.length > 0) {
-        document.getElementById('historico').innerHTML = coletas.map(c => `
+        // Buscar histórico
+        try {
+          const coletas = await apiFetch("/api/coletas");
+          if (coletas.length > 0) {
+            document.getElementById("historico").innerHTML = coletas
+              .map(
+                (c) => `
           <div class="h-item">
-            <div class="h-icon">${MATERIAL_ICONS[c.tipo_material] || '📦'}</div>
+            <div class="h-icon">${MATERIAL_ICONS[c.tipo_material] || "📦"}</div>
             <div class="h-info">
               <div class="h-title">${c.tipo_material.charAt(0).toUpperCase() + c.tipo_material.slice(1)}</div>
               <div class="h-date">${c.data_registro}</div>
@@ -209,55 +408,122 @@
               <span class="h-pts-kg">${c.peso_kg}kg</span>
             </div>
           </div>
-        `).join('');
-      } else {
-        document.getElementById('historico').innerHTML = `
+        `,
+              )
+              .join("");
+          } else {
+            document.getElementById("historico").innerHTML = `
           <div class="empty-state">
             <span class="empty-icon">🌱</span>
             <p>Você ainda não realizou nenhum descarte.</p>
           </div>`;
+          }
+        } catch (e) {
+          document.getElementById("historico").innerHTML =
+            `<div class="alert alert-error">Erro ao carregar histórico.</div>`;
+        }
+
+        // Lógica do Formulário
+        form.onsubmit = async (e) => {
+          e.preventDefault();
+
+          const data = {
+            tipo_material: document.getElementById("tipo_material").value,
+            peso_kg: document.getElementById("peso_kg").value,
+          };
+
+          try {
+            btnReg.disabled = true;
+            btnReg.textContent = "Registrando...";
+
+            const result = await apiFetch("/api/coletas", {
+              method: "POST",
+              body: data,
+            });
+
+            alert(`✅ Sucesso! Você ganhou ${result.pontos} pontos.`);
+            form.reset();
+            init();
+          } catch (err) {
+            alert(`❌ Erro: ${err.message || "Falha ao registrar"}`);
+          } finally {
+            btnReg.disabled = false;
+            btnReg.textContent = "Registrar e Ganhar Pontos";
+          }
+        };
       }
-    } catch (e) {
-      document.getElementById('historico').innerHTML = `<div class="alert alert-error">Erro ao carregar histórico.</div>`;
-    }
 
-    // Lógica do Formulário
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      
-      const data = {
-        tipo_material: document.getElementById('tipo_material').value,
-        peso_kg: document.getElementById('peso_kg').value
-      };
+      async function logout() {
+        await apiFetch("/api/auth/logout", { method: "POST" });
+        window.location.href = "/login.html";
+      }
 
-      try {
-        btnReg.disabled = true;
-        btnReg.textContent = 'Registrando...';
+      function abrirModalAlterarSenha() {
+        const modal = document.getElementById("modalAlterarSenha");
+        modal.style.display = "flex";
+        document.getElementById("formAlterarSenha").reset();
+      }
 
-        const result = await apiFetch('/api/coletas', {
-          method: 'POST',
-          body: data
+      function fecharModalAlterarSenha() {
+        document.getElementById("modalAlterarSenha").style.display = "none";
+      }
+
+      async function handleAlterarSenha(e) {
+        e.preventDefault();
+
+        const senhaAtual = document.getElementById("senhaAtual").value;
+        const novaSenha = document.getElementById("novaSenha").value;
+        const confirmarSenha = document.getElementById("confirmarSenha").value;
+        const btn = document.querySelector(
+          '#formAlterarSenha button[type="submit"]',
+        );
+
+        if (!senhaAtual || !novaSenha || !confirmarSenha) {
+          alert("❌ Preencha todos os campos");
+          return;
+        }
+
+        if (novaSenha !== confirmarSenha) {
+          alert("❌ As senhas não conferem");
+          return;
+        }
+
+        if (novaSenha.length < 6) {
+          alert("❌ Senha deve ter no mínimo 6 caracteres");
+          return;
+        }
+
+        try {
+          btn.disabled = true;
+          btn.textContent = "⏳ Alterando...";
+
+          const response = await apiFetch("/api/auth/alterar-senha", {
+            method: "POST",
+            body: { senhaAtual, novaSenha, confirmarSenha },
+          });
+
+          if (response.sucesso) {
+            alert("✅ Senha alterada com sucesso!");
+            fecharModalAlterarSenha();
+          } else {
+            alert(`❌ ${response.erro || "Erro ao alterar senha"}`);
+          }
+        } catch (err) {
+          alert(`❌ ${err.message}`);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "✅ Alterar Senha";
+        }
+      }
+
+      // Fechar modal ao clicar fora
+      document
+        .getElementById("modalAlterarSenha")
+        ?.addEventListener("click", (e) => {
+          if (e.target.id === "modalAlterarSenha") fecharModalAlterarSenha();
         });
 
-        alert(`✅ Sucesso! Você ganhou ${result.pontos} pontos.`);
-        form.reset();
-        init(); 
-      } catch (err) {
-        alert(`❌ Erro: ${err.message || 'Falha ao registrar'}`);
-      } finally {
-        btnReg.disabled = false;
-        btnReg.textContent = 'Registrar e Ganhar Pontos';
-      }
-    };
-  }
-
-  async function logout() {
-    await apiFetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login.html';
-  }
-
-  init();
-</script>
-
-</body>
+      init();
+    </script>
+  </body>
 </html>
