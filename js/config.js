@@ -1,11 +1,6 @@
 // Configuração global da API
-// Em desenvolvimento (monolito), deixe vazio para usar a mesma origem.
-// Em produção (separado), coloque a URL do seu backend na Vercel.
-const API_URL =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1"
-    ? ""
-    : "https://ecoscore-backend.vercel.app";
+// Sempre usar o backend no Vercel
+const API_URL = "https://ecoscore-backend.vercel.app";
 
 // Helper para fetch com credenciais e parsing automático
 async function apiFetch(endpoint, options = {}) {
