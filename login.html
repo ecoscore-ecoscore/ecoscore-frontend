@@ -180,13 +180,12 @@
         document.getElementById("alertBox").style.display = "none";
 
         try {
-          const res = await apiFetch("/api/auth/login", {
+          const data = await apiFetch("/api/auth/login", {
             method: "POST",
             body: { login, senha },
           });
-          const data = await res.json();
 
-          if (res.ok) {
+          if (data.sucesso) {
             window.location.href = data.redirecionar || "/";
             return;
           }
