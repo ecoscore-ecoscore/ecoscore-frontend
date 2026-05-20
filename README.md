@@ -53,12 +53,12 @@ const API_URL =
 
 ## 🔑 Credenciais de Teste
 
-| Tipo          | Usuário             | Senha            |
-| ------------- | ------------------- | ---------------- |
-| Empresa/Admin | `demo@ecoscore.com` | `demo123`        |
-| Setor         | `marketing`         | `ecoscore123`    |
-| Funcionário   | `ana@demo.com`      | `funcionario123` |
-| Super Admin   | `eco_master`        | `eco123`         |
+| Tipo          | Usuário                 | Senha            |
+| ------------- | ----------------------- | ---------------- |
+| Empresa/Admin | `ecoscore994@gmail.com` | `ecoscoreadmin`  |
+| Setor         | `marketing`             | `ecoscore123`    |
+| Funcionário   | `ana@demo.com`          | `funcionario123` |
+| Super Admin   | `eco_master`            | `eco123`         |
 
 ---
 
@@ -140,7 +140,7 @@ async function apiFetch(endpoint, options = {}) {
 // Fazer login
 const res = await apiFetch("/api/auth/login", {
   method: "POST",
-  body: { login: "demo@ecoscore.com", senha: "demo123" },
+  body: { login: "ecoscore994@gmail.com", senha: "ecoscoreadmin" },
 });
 
 const data = res.json ? await res.json() : res;
