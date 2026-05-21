@@ -1,22 +1,5 @@
-# Build
-dist/
-build/
-*.zip
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Dependencies (se usar npm)
-node_modules/
-package-lock.json
-
-# Logs
+node_modules
+.env
+.vercel
 *.log
+package-lock.json
