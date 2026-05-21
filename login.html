@@ -185,27 +185,41 @@
             body: { login, senha },
           });
 
-          if (data.sucesso) {
+          // Sucesso no Login
+          const btn = document.getElementById("btnSubmit");
+          btn.innerHTML = '<span>✅ Acesso Autorizado!</span>';
+          btn.style.background = 'var(--green-600)';
+          
+          setTimeout(() => {
             window.location.href = data.redirecionar || "/";
-            return;
+          }, 800);
+
+        } catch (err) {
+          setLoading(false);
+          
+          let msg = "<strong>Erro inesperado.</strong><br>Por favor, tente novamente em instantes.";
+          let type = "error";
+
+          if (err.status === 401) {
+            msg = "<strong>Usuário ou senha incorretos.</strong><br>Verifique seus dados de acesso.";
+          } else if (err.status === 403) {
+            msg = "<strong>Acesso negado.</strong><br>Esta conta está inativa ou bloqueada.";
+          } else if (err.status === 503 || err.status === 500) {
+            msg = "<strong>Instabilidade na rede.</strong><br>O banco de dados está demorando a responder. Tente novamente.";
+            type = "warning";
+          } else if (err.message && err.message.includes("fetch")) {
+            msg = "<strong>Sem conexão com o servidor.</strong><br>Verifique sua internet.";
           }
 
-          if (data.erro === "acesso_bloqueado") {
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("bloqueioBox").style.display = "block";
-            document.getElementById("bloqueioMsg").textContent = data.mensagem;
-            document.getElementById("bloqueioDetalhes").innerHTML = `
-          <div class="alert alert-info" style="text-align:left; flex-direction: column; align-items: flex-start;">
-            <div>📅 Hoje: <strong>${data.diaAtual}</strong></div>
-            <div style="margin-top:0.4rem">🗓️ Seu dia de coleta: <strong>${data.diaColeta}</strong></div>
-          </div>`;
-          } else {
-            showAlert(data.erro || "Credenciais inválidas", "error");
+          showAlert(msg, type);
+
+          // Efeito de vibração (Shake) no card para indicar erro
+          const card = document.querySelector('.login-card');
+          if (card) {
+            card.style.animation = 'none';
+            card.offsetHeight; // trigger reflow
+            card.style.animation = 'shake 0.4s ease-in-out';
           }
-        } catch (err) {
-          showAlert("Erro de conexão com o servidor.", "error");
-        } finally {
-          setLoading(false);
         }
       }
 
