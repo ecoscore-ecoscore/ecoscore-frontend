@@ -59,9 +59,8 @@
 
       .user-stats {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        max-width: 600px;
+        grid-template-columns: 1fr;
+        max-width: 400px;
         margin: -2.5rem auto 2.5rem;
         padding: 0 1rem;
         position: relative;
@@ -76,7 +75,7 @@
         box-shadow: var(--shadow);
       }
       .u-stat-val {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
         font-weight: 900;
         color: var(--gold);
         display: block;
@@ -151,7 +150,7 @@
   </head>
   <body>
     <nav class="navbar">
-      <a href="/portal.html" class="navbar-brand">
+      <a href="/" class="navbar-brand">
         <span class="logo-icon">🌿</span>
         <div>
           <span class="logo-text">EcoScore</span>
@@ -179,46 +178,20 @@
     <div class="user-stats">
       <div class="u-stat-card">
         <span class="u-stat-val" id="totalPontos">0</span>
-        <span class="u-stat-lab">Meus Pontos</span>
-      </div>
-      <div class="u-stat-card">
-        <span class="u-stat-val" id="totalKg">0.0</span>
-        <span class="u-stat-lab">kg Reciclados</span>
+        <span class="u-stat-lab">Meus Pontos Acumulados</span>
       </div>
     </div>
 
     <main class="history-section">
-      <div class="card mb-4">
-        <h3 class="card-title">📦 Registrar Novo Descarte</h3>
-        <form id="formColeta" class="form-grid">
-          <div class="form-group">
-            <label>Material</label>
-            <select id="tipo_material" class="form-control" required>
-              <option value="">Selecione...</option>
-              <option value="metal">Metal (10 pts/kg)</option>
-              <option value="vidro">Vidro (7 pts/kg)</option>
-              <option value="plastico">Plástico (5 pts/kg)</option>
-              <option value="papel">Papel (3 pts/kg)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Peso (kg)</label>
-            <input
-              type="number"
-              id="peso_kg"
-              step="0.1"
-              min="0.1"
-              class="form-control"
-              placeholder="0.0"
-              required
-            />
-          </div>
-          <div class="form-actions" style="grid-column: span 2">
-            <button type="submit" class="btn btn-primary btn-block">
-              Registrar e Ganhar Pontos
-            </button>
-          </div>
-        </form>
+      <div class="card mb-4" style="background: rgba(76, 175, 80, 0.05); border-color: var(--green-500);">
+        <h3 class="card-title">🎁 Resgate de Prêmios</h3>
+        <p class="text-dim mb-3" style="font-size: 0.9rem;">
+          Troque seus pontos acumulados por recompensas exclusivas. A solicitação deve ser validada pelo seu líder de setor no momento do descarte.
+        </p>
+        <div style="display: flex; gap: 1rem;">
+          <a href="recompensas.html" class="btn btn-gold" style="flex: 1;">Ver Catálogo</a>
+          <a href="ranking.html" class="btn btn-secondary" style="flex: 1;">Ver Ranking</a>
+        </div>
       </div>
 
       <div class="card mb-4">
@@ -227,15 +200,12 @@
           onclick="abrirModalAlterarSenha()"
           class="btn btn-secondary btn-full"
         >
-          🔒 Alterar Senha
+          🔒 Alterar Minha Senha
         </button>
       </div>
 
       <div class="flex-between mb-2">
-        <h2 class="section-title" style="margin-bottom: 0">📜 Meu Histórico</h2>
-        <a href="ranking.html" class="btn btn-secondary btn-sm"
-          >🏆 Ver Ranking</a
-        >
+        <h2 class="section-title" style="margin-bottom: 0">📜 Histórico de Descartes</h2>
       </div>
 
       <div id="historico">
@@ -244,34 +214,13 @@
           <p>Carregando seus registros...</p>
         </div>
       </div>
-
-      <div
-        class="card mt-3 text-center"
-        style="
-          background: rgba(255, 193, 7, 0.05);
-          border-color: rgba(255, 193, 7, 0.2);
-        "
-      >
-        <p class="text-muted mb-2">
-          Continue descartando corretamente para ganhar mais pontos!
-        </p>
-        <a href="recompensas.html" class="btn btn-gold">🎁 Resgatar Prêmios</a>
-      </div>
     </main>
 
     <!-- Modal para alterar senha -->
     <div
       id="modalAlterarSenha"
-      style="
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      "
+      class="modal-overlay"
+      style="display: none;"
     >
       <div
         style="
@@ -346,14 +295,6 @@
         plastico: "🧴",
         papel: "📄",
       };
-      const DIAS = [
-        "",
-        "Segunda-feira",
-        "Terça-feira",
-        "Quarta-feira",
-        "Quinta-feira",
-        "Sexta-feira",
-      ];
 
       async function init() {
         const me = await apiFetch("/api/me").catch(() => ({ logado: false }));
@@ -363,31 +304,13 @@
         }
 
         document.getElementById("userName").textContent = me.nome;
-        document.getElementById("userSetor").textContent =
-          `🏢 Setor: ${me.setor_nome || "Não vinculado"} (${DIAS[me.dia_semana] || "Sem dia fixo"})`;
-
-        // Validar dia de coleta
-        const diaHoje = new Date().getDay();
-        const liberado = diaHoje === me.dia_semana;
-        const form = document.getElementById("formColeta");
-        const btnReg = form.querySelector("button");
-
-        if (!liberado) {
-          form.style.opacity = "0.6";
-          form.style.pointerEvents = "none";
-          btnReg.innerHTML = `🔒 Disponível apenas na ${DIAS[me.dia_semana]}`;
-          btnReg.classList.replace("btn-primary", "btn-secondary");
-        }
+        document.getElementById("userSetor").textContent = `🏢 Setor: ${me.setor_nome || "Não vinculado"}`;
 
         // Buscar pontos via ranking
         const ranking = await apiFetch("/api/ranking/funcionarios");
         const eu = ranking.find((r) => r.funcionario_nome === me.nome);
-
         if (eu) {
-          document.getElementById("totalPontos").textContent =
-            eu.total_pontos.toLocaleString();
-          document.getElementById("totalKg").textContent =
-            eu.total_kg.toFixed(1);
+          document.getElementById("totalPontos").textContent = eu.total_pontos.toLocaleString();
         }
 
         // Buscar histórico
@@ -419,38 +342,8 @@
           </div>`;
           }
         } catch (e) {
-          document.getElementById("historico").innerHTML =
-            `<div class="alert alert-error">Erro ao carregar histórico.</div>`;
+          document.getElementById("historico").innerHTML = `<div class="alert alert-error">Erro ao carregar histórico.</div>`;
         }
-
-        // Lógica do Formulário
-        form.onsubmit = async (e) => {
-          e.preventDefault();
-
-          const data = {
-            tipo_material: document.getElementById("tipo_material").value,
-            peso_kg: document.getElementById("peso_kg").value,
-          };
-
-          try {
-            btnReg.disabled = true;
-            btnReg.textContent = "Registrando...";
-
-            const result = await apiFetch("/api/coletas", {
-              method: "POST",
-              body: data,
-            });
-
-            alert(`✅ Sucesso! Você ganhou ${result.pontos} pontos.`);
-            form.reset();
-            init();
-          } catch (err) {
-            alert(`❌ Erro: ${err.message || "Falha ao registrar"}`);
-          } finally {
-            btnReg.disabled = false;
-            btnReg.textContent = "Registrar e Ganhar Pontos";
-          }
-        };
       }
 
       async function logout() {
@@ -470,38 +363,22 @@
 
       async function handleAlterarSenha(e) {
         e.preventDefault();
-
         const senhaAtual = document.getElementById("senhaAtual").value;
         const novaSenha = document.getElementById("novaSenha").value;
         const confirmarSenha = document.getElementById("confirmarSenha").value;
-        const btn = document.querySelector(
-          '#formAlterarSenha button[type="submit"]',
-        );
+        const btn = document.querySelector('#formAlterarSenha button[type="submit"]');
 
-        if (!senhaAtual || !novaSenha || !confirmarSenha) {
-          alert("❌ Preencha todos os campos");
-          return;
-        }
-
-        if (novaSenha !== confirmarSenha) {
-          alert("❌ As senhas não conferem");
-          return;
-        }
-
-        if (novaSenha.length < 6) {
-          alert("❌ Senha deve ter no mínimo 6 caracteres");
-          return;
-        }
+        if (!senhaAtual || !novaSenha || !confirmarSenha) { alert("❌ Preencha todos os campos"); return; }
+        if (novaSenha !== confirmarSenha) { alert("❌ As senhas não conferem"); return; }
+        if (novaSenha.length < 6) { alert("❌ Senha deve ter no mínimo 6 caracteres"); return; }
 
         try {
           btn.disabled = true;
           btn.textContent = "⏳ Alterando...";
-
           const response = await apiFetch("/api/auth/alterar-senha", {
             method: "POST",
             body: { senhaAtual, novaSenha, confirmarSenha },
           });
-
           if (response.sucesso) {
             alert("✅ Senha alterada com sucesso!");
             fecharModalAlterarSenha();
@@ -516,12 +393,9 @@
         }
       }
 
-      // Fechar modal ao clicar fora
-      document
-        .getElementById("modalAlterarSenha")
-        ?.addEventListener("click", (e) => {
-          if (e.target.id === "modalAlterarSenha") fecharModalAlterarSenha();
-        });
+      document.getElementById("modalAlterarSenha")?.addEventListener("click", (e) => {
+        if (e.target.id === "modalAlterarSenha") fecharModalAlterarSenha();
+      });
 
       init();
     </script>

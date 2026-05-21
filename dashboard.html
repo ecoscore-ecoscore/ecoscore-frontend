@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meu Setor — EcoScore</title>
+    <title>Painel do Setor — EcoScore</title>
     <link rel="stylesheet" href="/css/style.css" />
     <script src="/js/config.js"></script>
     <style>
@@ -85,43 +85,36 @@
         border-radius: 50%;
         flex-shrink: 0;
       }
-      .dot-metal {
-        background: var(--gold);
-      }
-      .dot-vidro {
-        background: #42a5f5;
-      }
-      .dot-plastico {
-        background: #66bb6a;
-      }
-      .dot-papel {
-        background: #ffa726;
+      .dot-metal { background: var(--gold); }
+      .dot-vidro { background: #42a5f5; }
+      .dot-plastico { background: #66bb6a; }
+      .dot-papel { background: #ffa726; }
+
+      /* Estilos para o Modal de Resgate */
+      .resgate-item {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
     </style>
   </head>
   <body>
     <nav class="navbar">
-      <a href="/portal.html" class="navbar-brand">
+      <a href="/" class="navbar-brand">
         <span class="logo-icon">🌿</span>
         <div>
           <span class="logo-text">EcoScore</span>
-          <span class="logo-sub">Gestão Sustentável de Resíduos</span>
+          <span class="logo-sub">Gestão do Setor</span>
         </div>
       </a>
-      <ul class="navbar-nav">
-        <li><a href="dashboard.html" class="active">Painel</a></li>
-        <li><a href="registro.html">Registrar</a></li>
-        <li><a href="ranking.html">Ranking</a></li>
-        <li><a href="recompensas.html">Recompensas</a></li>
-      </ul>
       <div class="navbar-actions">
-        <span
-          id="navSetor"
-          style="font-size: 0.85rem; color: var(--text-muted)"
-        ></span>
-        <button onclick="logout()" class="btn btn-secondary btn-sm">
-          Sair
-        </button>
+        <span id="navSetor" style="font-size: 0.85rem; color: var(--text-muted)"></span>
+        <button onclick="logout()" class="btn btn-secondary btn-sm">Sair</button>
       </div>
     </nav>
 
@@ -142,343 +135,199 @@
           <div class="stat-card">
             <span class="stat-icon">📦</span>
             <div>
-              <div class="stat-value" id="statColetas">—</div>
+              <div class="stat-value" id="statColetas">0</div>
               <div class="stat-label">Coletas Hoje</div>
             </div>
           </div>
           <div class="stat-card">
             <span class="stat-icon">⚖️</span>
             <div>
-              <div class="stat-value" id="statKg">—</div>
+              <div class="stat-value" id="statKg">0.0kg</div>
               <div class="stat-label">kg Registrados</div>
             </div>
           </div>
           <div class="stat-card">
             <span class="stat-icon">🏅</span>
             <div>
-              <div class="stat-value" id="statPontos">—</div>
+              <div class="stat-value" id="statPontos">0</div>
               <div class="stat-label">Pontos Total</div>
             </div>
           </div>
           <div class="stat-card">
             <span class="stat-icon">👥</span>
             <div>
-              <div class="stat-value" id="statFuncionarios">—</div>
+              <div class="stat-value" id="statFuncionarios">0</div>
               <div class="stat-label">Funcionários</div>
             </div>
           </div>
         </div>
 
         <!-- Ações Rápidas -->
-        <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem">
-          Ações Rápidas
-        </h2>
+        <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem">Central de Ações</h2>
         <div class="quick-actions">
           <a href="registro.html" class="action-card" id="cardRegistrar">
             <span class="action-icon">📝</span>
-            <div class="action-title">Registrar Coleta</div>
-            <div class="action-desc">Informe nome, material e peso</div>
+            <div class="action-title">Registrar Novo Descarte</div>
+            <div class="action-desc">Ponto de coleta oficial do setor</div>
           </a>
+          <button class="action-card" onclick="abrirModalResgates()">
+            <span class="action-icon">🎁</span>
+            <div class="action-title">Validar Resgates</div>
+            <div class="action-desc">Aprovar trocas de pontos</div>
+          </button>
           <a href="ranking.html" class="action-card">
             <span class="action-icon">🏆</span>
-            <div class="action-title">Ver Ranking</div>
-            <div class="action-desc">Compare com outros setores</div>
-          </a>
-          <a href="recompensas.html" class="action-card">
-            <span class="action-icon">🎁</span>
-            <div class="action-title">Recompensas</div>
-            <div class="action-desc">Troque seus pontos por prêmios</div>
+            <div class="action-title">Ranking da Empresa</div>
+            <div class="action-desc">Desempenho dos setores</div>
           </a>
         </div>
 
         <!-- Configurações -->
         <div style="margin-top: 2rem">
-          <button
-            onclick="abrirModalAlterarSenha()"
-            class="btn btn-secondary btn-full"
-          >
-            🔒 Alterar Senha
-          </button>
+          <button onclick="abrirModalAlterarSenha()" class="btn btn-secondary btn-full">🔒 Alterar Senha do Setor</button>
         </div>
 
         <!-- Histórico Recente -->
         <div style="margin-top: 2.5rem">
           <div class="flex-between mb-2">
-            <h2 style="font-size: 1.1rem; font-weight: 700">
-              Coletas Recentes do Setor
-            </h2>
-            <a
-              href="registro.html"
-              class="btn btn-secondary btn-sm"
-              id="btnNovaColeta"
-              >+ Nova Coleta</a
-            >
+            <h2 style="font-size: 1.1rem; font-weight: 700">Histórico de Atividade</h2>
+            <a href="registro.html" class="btn btn-secondary btn-sm" id="btnNovaColeta">+ Nova Coleta</a>
           </div>
           <div class="card" style="padding: 0; overflow: hidden" id="historico">
             <div class="empty-state">
               <span class="empty-icon">📭</span>
-              <p>Nenhuma coleta registrada ainda</p>
+              <p>Nenhum descarte registrado ainda.</p>
             </div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Modal para alterar senha -->
-    <div
-      id="modalAlterarSenha"
-      style="
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 2rem;
-          max-width: 400px;
-          width: 90%;
-          box-shadow: var(--glow);
-        "
-      >
-        <h2 style="margin-bottom: 1.5rem; color: var(--gold)">
-          🔒 Alterar Senha
-        </h2>
-        <form
-          id="formAlterarSenha"
-          onsubmit="handleAlterarSenha(event)"
-          class="form-grid"
-        >
-          <div class="form-group">
-            <label>Senha Atual</label>
-            <input
-              type="password"
-              id="senhaAtual"
-              class="form-control"
-              placeholder="Digite sua senha atual"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Nova Senha</label>
-            <input
-              type="password"
-              id="novaSenha"
-              class="form-control"
-              placeholder="Digite a nova senha (mín. 6 caracteres)"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Confirmar Nova Senha</label>
-            <input
-              type="password"
-              id="confirmarSenha"
-              class="form-control"
-              placeholder="Confirme a nova senha"
-              required
-            />
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
-            <button type="submit" class="btn btn-primary">
-              ✅ Alterar Senha
-            </button>
-            <button
-              type="button"
-              onclick="fecharModalAlterarSenha()"
-              class="btn btn-secondary"
-            >
-              ❌ Cancelar
-            </button>
-          </div>
+    <!-- Modal Resgates -->
+    <div id="modalResgates" class="modal-overlay" style="display: none;">
+      <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 class="modal-title">🎁 Resgates Pendentes</h3>
+          <button class="modal-close" onclick="fecharModalResgates()">✕</button>
+        </div>
+        <div id="listaResgates" style="padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+          <p class="text-center text-dim">Carregando solicitações...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Alterar Senha -->
+    <div id="modalAlterarSenha" class="modal-overlay" style="display: none;">
+      <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+          <h3 class="modal-title">🔒 Alterar Senha</h3>
+          <button class="modal-close" onclick="fecharModalAlterarSenha()">✕</button>
+        </div>
+        <form id="formAlterarSenha" onsubmit="handleAlterarSenha(event)" style="padding: 1.5rem;">
+          <div class="form-group"><input type="password" id="senhaAtual" class="form-control" placeholder="Senha atual" required></div>
+          <div class="form-group"><input type="password" id="novaSenha" class="form-control" placeholder="Nova senha" required></div>
+          <div class="form-group"><input type="password" id="confirmarSenha" class="form-control" placeholder="Confirmar nova senha" required></div>
+          <button type="submit" class="btn btn-primary btn-full">✅ Salvar Nova Senha</button>
         </form>
       </div>
     </div>
 
     <script>
-      const DIAS = [
-        "",
-        "Segunda-feira",
-        "Terça-feira",
-        "Quarta-feira",
-        "Quinta-feira",
-        "Sexta-feira",
-      ];
-      const MATERIAL_ICONS = {
-        metal: "🔩",
-        vidro: "🪟",
-        plastico: "🧴",
-        papel: "📄",
-      };
-      const MATERIAL_DOTS = {
-        metal: "dot-metal",
-        vidro: "dot-vidro",
-        plastico: "dot-plastico",
-        papel: "dot-papel",
-      };
+      const DIAS = ["", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
+      const MATERIAL_ICONS = { metal: "🔩", vidro: "🪟", plastico: "🧴", papel: "📄" };
+      const MATERIAL_DOTS = { metal: "dot-metal", vidro: "dot-vidro", plastico: "dot-plastico", papel: "dot-papel" };
 
       async function init() {
         const me = await apiFetch("/api/me");
-        if (!me.logado || me.tipo !== "setor") {
-          window.location.href = "/login.html";
-          return;
-        }
+        if (!me.logado || me.tipo !== "setor") { window.location.href = "/login.html"; return; }
 
-        const setor = me.setor;
-        document.getElementById("sectorName").textContent = `🏢 ${setor.nome}`;
-        document.getElementById("sectorDesc").textContent =
-          `Dia de coleta: ${DIAS[setor.dia_semana]}`;
-        document.getElementById("navSetor").textContent = setor.nome;
+        document.getElementById("sectorName").textContent = `🏢 ${me.nome}`;
+        document.getElementById("sectorDesc").textContent = `Dia oficial de coleta: ${DIAS[me.dia_semana]}`;
+        document.getElementById("navSetor").textContent = me.nome;
 
         const diaHoje = new Date().getDay();
-        const liberado = diaHoje === setor.dia_semana;
-
+        const liberado = diaHoje === me.dia_semana;
         const badge = document.getElementById("statusBadge");
+
         if (liberado) {
           badge.innerHTML = `<div class="status-badge status-liberado"><div class="pulse-dot"></div>Coleta Liberada Hoje!</div>`;
-          document.getElementById("cardRegistrar").style.borderColor =
-            "var(--green-500)";
-          document.getElementById("cardRegistrar").style.boxShadow =
-            "var(--glow)";
         } else {
           badge.innerHTML = `<div class="status-badge status-bloqueado">🔒 Coleta Indisponível</div>`;
           const cardReg = document.getElementById("cardRegistrar");
           cardReg.style.opacity = "0.5";
           cardReg.style.cursor = "not-allowed";
           cardReg.removeAttribute("href");
-          cardReg.addEventListener("click", (e) => {
-            e.preventDefault();
-            alert(`Registro disponível apenas na ${DIAS[setor.dia_semana]}.`);
-          });
-          document.getElementById("btnNovaColeta").style.opacity = "0.4";
-          document
-            .getElementById("btnNovaColeta")
-            .addEventListener("click", (e) => e.preventDefault());
+          cardReg.onclick = (e) => { e.preventDefault(); alert(`O registro oficial do seu setor é na ${DIAS[me.dia_semana]}.`); };
+          document.getElementById("btnNovaColeta").style.display = "none";
         }
 
-        // Carregar coletas
         try {
           const coletas = await apiFetch("/api/coletas");
           const hoje = new Date().toISOString().split("T")[0];
           const coletasHoje = coletas.filter((c) => c.data_registro === hoje);
-          const totalKg = coletas.reduce((s, c) => s + c.peso_kg, 0);
+          const totalKg = coletas.reduce((s, c) => s + c.weight_kg || c.peso_kg || 0, 0);
           const totalPontos = coletas.reduce((s, c) => s + c.pontos, 0);
-          const funcionariosUnicos = new Set(
-            coletas.map((c) => c.funcionario_nome),
-          ).size;
+          const funcionariosUnicos = new Set(coletas.map((c) => c.funcionario_nome)).size;
 
-          document.getElementById("statColetas").textContent =
-            coletasHoje.length;
-          document.getElementById("statKg").textContent =
-            totalKg.toFixed(1) + "kg";
-          document.getElementById("statPontos").textContent =
-            totalPontos.toLocaleString();
-          document.getElementById("statFuncionarios").textContent =
-            funcionariosUnicos;
+          document.getElementById("statColetas").textContent = coletasHoje.length;
+          document.getElementById("statKg").textContent = totalKg.toFixed(1) + "kg";
+          document.getElementById("statPontos").textContent = totalPontos.toLocaleString();
+          document.getElementById("statFuncionarios").textContent = funcionariosUnicos;
 
           if (coletas.length > 0) {
-            const recent = coletas.slice(0, 8);
             document.getElementById("historico").innerHTML = `
-          <div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem">
-            ${recent
-              .map(
-                (c) => `
-              <div class="coleta-item">
-                <div class="material-dot ${MATERIAL_DOTS[c.tipo_material] || ""}"></div>
-                <div style="flex:1">
-                  <div style="font-weight:600;font-size:0.9rem">${c.funcionario_nome}</div>
-                  <div style="font-size:0.78rem;color:var(--text-dim)">${MATERIAL_ICONS[c.tipo_material] || ""} ${c.tipo_material} · ${c.data_registro}</div>
-                </div>
-                <div style="text-align:right">
-                  <div style="font-weight:700;font-size:0.9rem;color:var(--green-400)">${c.peso_kg}kg</div>
-                  <div style="font-size:0.75rem;color:var(--gold)">+${c.pontos} pts</div>
-                </div>
-              </div>
-            `,
-              )
-              .join("")}
-          </div>`;
+              <div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem">
+                ${coletas.slice(0, 10).map(c => `
+                  <div class="coleta-item">
+                    <div class="material-dot ${MATERIAL_DOTS[c.tipo_material] || ""}"></div>
+                    <div style="flex:1">
+                      <div style="font-weight:600;font-size:0.9rem">${c.funcionario_nome}</div>
+                      <div style="font-size:0.78rem;color:var(--text-dim)">${MATERIAL_ICONS[c.tipo_material] || "📦"} ${c.tipo_material} · ${c.data_registro}</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-weight:700;font-size:0.9rem;color:var(--green-400)">${c.peso_kg || c.weight_kg}kg</div>
+                      <div style="font-size:0.75rem;color:var(--gold)">+${c.pontos} pts</div>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>`;
           }
-        } catch {}
+        } catch(e) { console.error(e); }
       }
 
-      function abrirModalAlterarSenha() {
-        const modal = document.getElementById("modalAlterarSenha");
-        modal.style.display = "flex";
-        document.getElementById("formAlterarSenha").reset();
+      function abrirModalResgates() { 
+        document.getElementById("modalResgates").style.display = "flex";
+        document.getElementById("listaResgates").innerHTML = `
+          <div class="card" style="background:var(--dark-2); padding:1rem; text-align:center;">
+            <p>O fluxo de aprovação de resgates está sendo processado.</p>
+            <p class="text-dim" style="font-size:0.8rem">No momento do descarte, valide o saldo do funcionário no Ranking antes de entregar o prêmio.</p>
+          </div>
+        `;
       }
+      function fecharModalResgates() { document.getElementById("modalResgates").style.display = "none"; }
 
-      function fecharModalAlterarSenha() {
-        document.getElementById("modalAlterarSenha").style.display = "none";
-      }
+      function abrirModalAlterarSenha() { document.getElementById("modalAlterarSenha").style.display = "flex"; }
+      function fecharModalAlterarSenha() { document.getElementById("modalAlterarSenha").style.display = "none"; }
 
       async function handleAlterarSenha(e) {
         e.preventDefault();
-
-        const senhaAtual = document.getElementById("senhaAtual").value;
-        const novaSenha = document.getElementById("novaSenha").value;
-        const confirmarSenha = document.getElementById("confirmarSenha").value;
-        const btn = document.querySelector(
-          '#formAlterarSenha button[type="submit"]',
-        );
-
-        if (!senhaAtual || !novaSenha || !confirmarSenha) {
-          alert("❌ Preencha todos os campos");
-          return;
-        }
-
-        if (novaSenha !== confirmarSenha) {
-          alert("❌ As senhas não conferem");
-          return;
-        }
-
-        if (novaSenha.length < 6) {
-          alert("❌ Senha deve ter no mínimo 6 caracteres");
-          return;
-        }
-
+        const body = {
+          senhaAtual: document.getElementById("senhaAtual").value,
+          novaSenha: document.getElementById("novaSenha").value,
+          confirmarSenha: document.getElementById("confirmarSenha").value
+        };
         try {
-          btn.disabled = true;
-          btn.textContent = "⏳ Alterando...";
-
-          const response = await apiFetch("/api/auth/alterar-senha", {
-            method: "POST",
-            body: { senhaAtual, novaSenha, confirmarSenha },
-          });
-
-          if (response.sucesso) {
-            alert("✅ Senha alterada com sucesso!");
-            fecharModalAlterarSenha();
-          } else {
-            alert(`❌ ${response.erro || "Erro ao alterar senha"}`);
-          }
-        } catch (err) {
-          alert(`❌ ${err.message}`);
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "✅ Alterar Senha";
-        }
+          const res = await apiFetch("/api/auth/alterar-senha", { method: "POST", body });
+          alert("✅ Senha alterada com sucesso!");
+          fecharModalAlterarSenha();
+        } catch (err) { alert("❌ " + err.message); }
       }
 
-      // Fechar modal ao clicar fora
-      document
-        .getElementById("modalAlterarSenha")
-        ?.addEventListener("click", (e) => {
-          if (e.target.id === "modalAlterarSenha") fecharModalAlterarSenha();
-        });
+      async function logout() { await apiFetch("/api/auth/logout", { method: "POST" }); window.location.href = "/login.html"; }
 
-      async function logout() {
-        await apiFetch("/api/auth/logout", { method: "POST" });
-        window.location.href = "/login.html";
-      }
+      document.querySelectorAll(".modal-overlay").forEach(m => {
+        m.addEventListener("click", (e) => { if(e.target === m) m.style.display = "none"; });
+      });
 
       init();
     </script>
