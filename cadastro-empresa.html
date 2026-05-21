@@ -87,23 +87,15 @@
     msgBox.style.display = 'none';
 
     try {
-      const res = await apiFetch('/api/auth/register-company', {
+      await apiFetch('/api/auth/register-company', {
         method: 'POST',
         body: data
       });
 
-      const result = await res.json();
-
-      if (res.ok) {
-        showMsg('Empresa cadastrada com sucesso! Redirecionando...', 'success');
-        setTimeout(() => window.location.href = 'login.html', 1500);
-      } else {
-        showMsg(result.erro || 'Erro ao cadastrar empresa', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<span>✅ Criar Conta Grátis</span>';
-      }
+      showMsg('Empresa cadastrada com sucesso! Redirecionando...', 'success');
+      setTimeout(() => window.location.href = 'login.html', 1500);
     } catch (err) {
-      showMsg('Erro de conexão com o servidor', 'error');
+      showMsg(err.message || 'Erro ao cadastrar empresa', 'error');
       btn.disabled = false;
       btn.innerHTML = '<span>✅ Criar Conta Grátis</span>';
     }

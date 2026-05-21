@@ -683,20 +683,26 @@
         };
         const url = id ? `/api/admin/setores/${id}` : "/api/admin/setores";
         const method = id ? "PUT" : "POST";
-        const res = await apiFetch(url, { method, body });
-        const data = await res.json();
-        if (res.ok) {
+
+        try {
+          await apiFetch(url, { method, body });
           fecharModal("modalSetor");
           carregarSetores();
           showAlert("✅ Setor salvo com sucesso!");
-        } else showAlert("❌ " + data.erro, "error");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
+        }
       }
 
       async function apagarSetor(id) {
         if (!confirm("Desativar este setor?")) return;
-        await apiFetch(`/api/admin/setores/${id}`, { method: "DELETE" });
-        carregarSetores();
-        showAlert("✅ Setor desativado.");
+        try {
+          await apiFetch(`/api/admin/setores/${id}`, { method: "DELETE" });
+          carregarSetores();
+          showAlert("✅ Setor desativado.");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
+        }
       }
 
       // ─── FUNCIONÁRIOS ─────────────────
@@ -763,13 +769,15 @@
           ? `/api/admin/funcionarios/${id}`
           : "/api/admin/funcionarios";
         const method = id ? "PUT" : "POST";
-        const res = await apiFetch(url, { method, body });
-        const data = await res.json();
-        if (res.ok) {
+
+        try {
+          await apiFetch(url, { method, body });
           fecharModal("modalFunc");
           carregarFuncionarios();
           showAlert("✅ Funcionário salvo!");
-        } else showAlert("❌ " + (data.erro || "Erro ao salvar"), "error");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
+        }
       }
 
       async function apagarFunc(id) {
@@ -839,18 +847,26 @@
         };
         const url = id ? `/api/recompensas/${id}` : "/api/recompensas";
         const method = id ? "PUT" : "POST";
-        const res = await apiFetch(url, { method, body });
-        if (res.ok) {
+
+        try {
+          await apiFetch(url, { method, body });
           fecharModal("modalRecomp");
           carregarRecompensas();
           showAlert("✅ Recompensa salva!");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
         }
       }
 
       async function apagarRecomp(id) {
         if (!confirm("Remover esta recompensa?")) return;
-        await apiFetch(`/api/recompensas/${id}`, { method: "DELETE" });
-        carregarRecompensas();
+        try {
+          await apiFetch(`/api/recompensas/${id}`, { method: "DELETE" });
+          carregarRecompensas();
+          showAlert("✅ Recompensa removida.");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
+        }
       }
 
       // ─── COLETAS ──────────────────────
@@ -886,9 +902,13 @@
 
       async function deletarColeta(id) {
         if (!confirm("Excluir este registro de coleta?")) return;
-        await apiFetch(`/api/coletas/${id}`, { method: "DELETE" });
-        carregarColetas();
-        showAlert("✅ Registro excluído.");
+        try {
+          await apiFetch(`/api/coletas/${id}`, { method: "DELETE" });
+          carregarColetas();
+          showAlert("✅ Registro excluído.");
+        } catch (err) {
+          showAlert("❌ " + err.message, "error");
+        }
       }
 
       function abrirModalAlterarSenha() {
