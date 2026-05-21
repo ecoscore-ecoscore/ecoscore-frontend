@@ -332,15 +332,14 @@
 
     const hoje = new Date();
     const diaAtual = hoje.getDay();
-    const setor = me.setor;
 
     document.getElementById('dataHoje').textContent = hoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('headerDesc').textContent = `Ponto de Coleta: ${setor.nome}`;
+    document.getElementById('headerDesc').textContent = `Ponto de Coleta: ${me.nome}`;
 
-    if (diaAtual !== setor.dia_semana) {
+    if (diaAtual !== me.dia_semana) {
       const DIAS = ['', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
       document.getElementById('statusDia').innerHTML = `<div class="badge badge-red">🔒 Coleta indisponível hoje</div>`;
-      showAlert(`Registro permitido apenas na ${DIAS[setor.dia_semana]}. Hoje não é o dia de coleta do seu setor.`, 'warning');
+      showAlert(`Registro permitido apenas na ${DIAS[me.dia_semana]}. Hoje não é o dia de coleta do seu setor.`, 'warning');
       document.getElementById('btnRegistrar').disabled = true;
       document.getElementById('btnRegistrar').style.opacity = '0.5';
     } else {
