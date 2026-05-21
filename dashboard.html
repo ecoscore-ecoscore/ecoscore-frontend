@@ -295,14 +295,71 @@
         } catch(e) { console.error(e); }
       }
 
-      function abrirModalResgates() { 
+      async function abrirModalResgates() { 
         document.getElementById("modalResgates").style.display = "flex";
-        document.getElementById("listaResgates").innerHTML = `
-          <div class="card" style="background:var(--dark-2); padding:1rem; text-align:center;">
-            <p>O fluxo de aprovação de resgates está sendo processado.</p>
-            <p class="text-dim" style="font-size:0.8rem">No momento do descarte, valide o saldo do funcionário no Ranking antes de entregar o prêmio.</p>
-          </div>
-        `;
+        await carregarResgates();
+      }
+
+      async function carregarResgates() {
+        const lista = document.getElementById("listaResgates");
+        lista.innerHTML = '<p class="text-center text-dim">Buscando solicitações...</p>';
+        
+        try {
+          const resgates = await apiFetch("/api/recompensas/pendentes");
+          if (resgates.length === 0) {
+            lista.innerHTML = '<p class="text-center text-dim" style="padding:2rem">Nenhum resgate pendente.</p>';
+            return;
+          }
+
+          lista.innerHTML = resgates.map(r => `
+            <div class="resgate-item">
+              <div style="flex:1">
+                <div style="font-weight:700; color:var(--text)">${r.funcionario_nome}</div>
+                <div style="font-size:0.85rem; color:var(--gold)">🎁 ${r.recompensa_id.nome} (${r.recompensa_id.pontuacao_necessaria} pts)</div>
+                <div style="font-size:0.75rem; color:var(--text-dim)">Data: ${r.data_resgate}</div>
+              </div>
+              <div style="display:flex; gap:0.5rem">
+                <button class="btn btn-primary btn-sm" onclick="aprovarResgate('${r.id}')">✅</button>
+                <button class="btn btn-secondary btn-sm" onclick="cancelarResgate('${r.id}')">✕</button>
+              </div>
+            </div>
+          `).join('');
+        } catch (err) {
+          lista.innerHTML = `<p class="text-center text-error">Erro ao carregar: ${err.message}</p>`;
+        }
+      }
+
+      async function aprovarResgate(id) {
+        if (!confirm("Confirmar a entrega física deste prêmio?")) return;
+        try {
+          await apiFetch(\`/api/recompensas/resgates/\${id}\`, { 
+            method: 'PUT', 
+            body: { status: 'aprovado' } 
+          });
+          showAlert("✅ Resgate aprovado com sucesso!");
+          carregarResgates();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function cancelarResgate(id) {
+        if (!confirm("Deseja cancelar esta solicitação?")) return;
+        try {
+          await apiFetch(\`/api/recompensas/resgates/\${id}\`, { 
+            method: 'PUT', 
+            body: { status: 'cancelado' } 
+          });
+          showAlert("❌ Solicitação cancelada.");
+          carregarResgates();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      function showAlert(msg) {
+        // Simples alert ou implementar um box fixo
+        alert(msg);
       }
       function fecharModalResgates() { document.getElementById("modalResgates").style.display = "none"; }
 

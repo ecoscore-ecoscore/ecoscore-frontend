@@ -103,7 +103,8 @@
   function setTab(tab) {
     tabAtual = tab;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
+    const btn = document.getElementById('tab-' + tab);
+    if (btn) btn.classList.add('active');
     renderRecompensas();
   }
 
@@ -113,15 +114,15 @@
       todasRecompensas.filter(r => r.tipo === tabAtual);
 
     if (filtradas.length === 0) {
-      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🌱</span><p>Nenhuma recompensa nesta categoria</p></div>';
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🌱</span><p>Nenhuma recompensa encontrada nesta categoria</p></div>';
       return;
     }
 
     grid.innerHTML = filtradas.map(r => {
       const saldo = r.tipo === 'individual' ? saldoUsuario : saldoSetor;
-      const pct = Math.min(100, saldo > 0 ? Math.round((saldo / r.pontuacao_necessaria) * 100) : 0);
+      const pct = Math.min(100, r.pontuacao_necessaria > 0 ? Math.round((saldo / r.pontuacao_necessaria) * 100) : 100);
       const podeResgatar = saldo >= r.pontuacao_necessaria;
-      const logado = sessionData && (sessionData.tipo === 'setor' || sessionData.tipo === 'funcionario');
+      const logado = sessionData && sessionData.logado;
 
       return `
         <div class="reward-card card">
@@ -135,7 +136,7 @@
           ${logado ? `
             <div class="saldo-bar mt-2"><div class="saldo-fill" style="width:${pct}%"></div></div>
             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">${pct}% (${saldo.toLocaleString()} / ${r.pontuacao_necessaria.toLocaleString()} pts)</div>
-            <button class="btn ${podeResgatar ? 'btn-gold' : 'btn-secondary'} btn-full" ${podeResgatar ? '' : 'disabled style="opacity:0.5;cursor:not-allowed"'} onclick="abrirModal('${r.id}')">
+            <button class="btn ${podeResgatar ? 'btn-gold' : 'btn-secondary'} btn-full" ${podeResgatar ? '' : 'disabled style="opacity:0.5;cursor:not-allowed"'} onclick="abrirModal('${r.id || r._id}')">
               ${podeResgatar ? '🎉 Solicitar Resgate' : '🔒 Pontos insuficientes'}
             </button>
           ` : `<a href="/login.html" class="btn btn-secondary btn-full" style="margin-top:1rem">🔑 Login para resgatar</a>`}
@@ -155,7 +156,7 @@
   }
 
   function abrirModal(id) {
-    recompensaAtual = todasRecompensas.find(r => r.id === id || r._id === id);
+    recompensaAtual = todasRecompensas.find(r => (r.id && r.id.toString() === id) || (r._id && r._id.toString() === id));
     if (!recompensaAtual) return;
     
     if (sessionData && sessionData.nome) {
@@ -209,50 +210,55 @@
   }
 
   async function init() {
-    sessionData = await apiFetch('/api/me').catch(() => ({ logado: false }));
+    try {
+      sessionData = await apiFetch('/api/me').catch(() => ({ logado: false }));
 
-    if (sessionData.logado) {
-      const navDash = document.getElementById('navDash');
-      navDash.style.display = '';
-      
-      if (sessionData.tipo === 'setor') {
-        navDash.href = 'dashboard.html';
-        navDash.textContent = 'Painel do Setor';
-        document.getElementById('saldoLabel').textContent = 'Pontos do Setor';
-      } else if (sessionData.tipo === 'funcionario') {
-        navDash.href = 'user.html';
-        navDash.textContent = 'Meu Perfil';
-        document.getElementById('saldoLabel').textContent = 'Meus Pontos';
-      } else if (sessionData.tipo === 'admin') {
-        navDash.href = 'admin.html';
-        navDash.textContent = 'Admin';
-      }
-
-      document.getElementById('saldoInfo').style.display = 'block';
-      document.getElementById('navActions').innerHTML = `<button onclick="apiFetch('/api/auth/logout',{method:'POST'}).then(()=>location.href='/login.html')" class="btn btn-secondary btn-sm">Sair</button>`;
-
-      // Buscar saldos
-      try {
-        if (sessionData.tipo === 'funcionario') {
-          const rankingFunc = await apiFetch('/api/ranking/funcionarios');
-          const eu = rankingFunc.find(f => f.funcionario_nome === sessionData.nome);
-          saldoUsuario = eu ? eu.total_pontos : 0;
-          document.getElementById('saldoAtual').textContent = saldoUsuario.toLocaleString();
-        }
-        
-        const rankingSetores = await apiFetch('/api/ranking/setores');
-        const meuSetorId = sessionData.setor_id || (sessionData.setor ? sessionData.setor.id : null);
-        const s = rankingSetores.find(s => s.id === meuSetorId || s._id === meuSetorId);
-        saldoSetor = s ? s.total_pontos : 0;
+      if (sessionData.logado) {
+        const navDash = document.getElementById('navDash');
+        navDash.style.display = '';
         
         if (sessionData.tipo === 'setor') {
-          document.getElementById('saldoAtual').textContent = saldoSetor.toLocaleString();
+          navDash.href = 'dashboard.html';
+          navDash.textContent = 'Painel do Setor';
+          document.getElementById('saldoLabel').textContent = 'Pontos do Setor';
+        } else if (sessionData.tipo === 'funcionario') {
+          navDash.href = 'user.html';
+          navDash.textContent = 'Meu Perfil';
+          document.getElementById('saldoLabel').textContent = 'Meus Pontos';
+        } else if (sessionData.tipo === 'admin') {
+          navDash.href = 'admin.html';
+          navDash.textContent = 'Admin';
         }
-      } catch(e) { console.error("Erro ao carregar saldos:", e); }
-    }
 
-    todasRecompensas = await apiFetch('/api/recompensas');
-    renderRecompensas();
+        document.getElementById('saldoInfo').style.display = 'block';
+        document.getElementById('navActions').innerHTML = `<button onclick="apiFetch('/api/auth/logout',{method:'POST'}).then(()=>location.href='/login.html')" class="btn btn-secondary btn-sm">Sair</button>`;
+
+        // Buscar saldos
+        try {
+          if (sessionData.tipo === 'funcionario') {
+            const rankingFunc = await apiFetch('/api/ranking/funcionarios');
+            const eu = rankingFunc.find(f => f.funcionario_nome === sessionData.nome);
+            saldoUsuario = eu ? eu.total_pontos : 0;
+            document.getElementById('saldoAtual').textContent = saldoUsuario.toLocaleString();
+          }
+          
+          const rankingSetores = await apiFetch('/api/ranking/setores');
+          const meuSetorId = sessionData.setor_id || (sessionData.setor ? sessionData.setor.id : null);
+          const s = rankingSetores.find(s => s.id === meuSetorId || s._id === meuSetorId);
+          saldoSetor = s ? s.total_pontos : 0;
+          
+          if (sessionData.tipo === 'setor') {
+            document.getElementById('saldoAtual').textContent = saldoSetor.toLocaleString();
+          }
+        } catch(e) { console.error("Erro ao carregar saldos:", e); }
+      }
+
+      todasRecompensas = await apiFetch('/api/recompensas');
+      renderRecompensas();
+    } catch (err) {
+      console.error("Erro no init:", err);
+      document.getElementById('rewardGrid').innerHTML = `<div class="alert alert-error">Erro ao carregar catálogo: ${err.message}</div>`;
+    }
   }
 
   // Fechar modal ao clicar fora
