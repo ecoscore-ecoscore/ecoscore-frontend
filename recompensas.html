@@ -30,7 +30,7 @@
     </div>
   </a>
   <ul class="navbar-nav">
-    <li><a href="dashboard.html" id="navDash" style="display:none">Painel</a></li>
+    <li><a href="#" id="navDash" style="display:none">Painel</a></li>
     <li><a href="ranking.html">Ranking</a></li>
     <li><a href="recompensas.html" class="active">Recompensas</a></li>
   </ul>
@@ -46,26 +46,27 @@
       <p class="page-desc">Troque seus pontos por prêmios incríveis</p>
     </div>
     <div id="saldoInfo" style="text-align:right;display:none">
-      <div style="font-size:0.8rem;color:var(--text-dim)">Seus pontos</div>
+      <div style="font-size:0.8rem;color:var(--text-dim)" id="saldoLabel">Seus pontos</div>
       <div id="saldoAtual" style="font-size:1.8rem;font-weight:900;color:var(--gold)">0</div>
     </div>
   </div>
 </div>
 
 <!-- Modal de resgate -->
-<div class="modal-overlay" id="modalResgate">
+<div class="modal-overlay" id="modalResgate" style="display: none;">
   <div class="modal">
     <div class="modal-header">
       <h3 class="modal-title">🎁 Resgatar Recompensa</h3>
       <button class="modal-close" onclick="fecharModal()">✕</button>
     </div>
-    <div id="modalBody">
+    <div id="modalBody" style="padding: 1.5rem;">
       <div class="form-group">
-        <label class="form-label" for="resgateFuncionario">👤 Seu Nome</label>
-        <input id="resgateFuncionario" class="form-control" type="text" placeholder="Nome completo" required>
+        <label class="form-label" for="resgateFuncionario">👤 Confirme seu Nome</label>
+        <input id="resgateFuncionario" class="form-control" type="text" placeholder="Seu nome completo" required>
       </div>
       <div id="resgateInfo" style="background:var(--dark-2);border-radius:var(--radius);padding:1rem;margin-bottom:1.25rem;font-size:0.85rem">
       </div>
+      <p class="text-dim" style="font-size: 0.8rem; margin-bottom: 1rem;">* Após confirmar, apresente esta tela ao líder do seu setor para validação física do prêmio.</p>
       <div id="resgateAlert" style="display:none;margin-bottom:1rem"></div>
       <button class="btn btn-gold btn-full btn-lg" onclick="confirmarResgate()">🎉 Confirmar Resgate</button>
     </div>
@@ -120,7 +121,7 @@
       const saldo = r.tipo === 'individual' ? saldoUsuario : saldoSetor;
       const pct = Math.min(100, saldo > 0 ? Math.round((saldo / r.pontuacao_necessaria) * 100) : 0);
       const podeResgatar = saldo >= r.pontuacao_necessaria;
-      const logado = sessionData && sessionData.tipo === 'setor';
+      const logado = sessionData && (sessionData.tipo === 'setor' || sessionData.tipo === 'funcionario');
 
       return `
         <div class="reward-card card">
@@ -134,8 +135,8 @@
           ${logado ? `
             <div class="saldo-bar mt-2"><div class="saldo-fill" style="width:${pct}%"></div></div>
             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">${pct}% (${saldo.toLocaleString()} / ${r.pontuacao_necessaria.toLocaleString()} pts)</div>
-            <button class="btn ${podeResgatar ? 'btn-gold' : 'btn-secondary'} btn-full" ${podeResgatar ? '' : 'disabled style="opacity:0.5;cursor:not-allowed"'} onclick="abrirModal(${r.id})">
-              ${podeResgatar ? '🎉 Resgatar' : '🔒 Pontos insuficientes'}
+            <button class="btn ${podeResgatar ? 'btn-gold' : 'btn-secondary'} btn-full" ${podeResgatar ? '' : 'disabled style="opacity:0.5;cursor:not-allowed"'} onclick="abrirModal('${r.id}')">
+              ${podeResgatar ? '🎉 Solicitar Resgate' : '🔒 Pontos insuficientes'}
             </button>
           ` : `<a href="/login.html" class="btn btn-secondary btn-full" style="margin-top:1rem">🔑 Login para resgatar</a>`}
         </div>
@@ -154,19 +155,24 @@
   }
 
   function abrirModal(id) {
-    recompensaAtual = todasRecompensas.find(r => r.id === id);
+    recompensaAtual = todasRecompensas.find(r => r.id === id || r._id === id);
     if (!recompensaAtual) return;
+    
+    if (sessionData && sessionData.nome) {
+      document.getElementById('resgateFuncionario').value = sessionData.nome;
+    }
+
     document.getElementById('resgateInfo').innerHTML = `
       <strong style="color:var(--text)">${recompensaAtual.nome}</strong><br>
       <span style="color:var(--gold);font-weight:700">${recompensaAtual.pontuacao_necessaria.toLocaleString()} pontos</span><br>
       <span style="color:var(--text-dim)">Tipo: ${recompensaAtual.tipo === 'individual' ? '👤 Individual' : '🏢 Coletiva'}</span>
     `;
     document.getElementById('resgateAlert').style.display = 'none';
-    document.getElementById('modalResgate').classList.add('open');
+    document.getElementById('modalResgate').style.display = 'flex';
   }
 
   function fecharModal() {
-    document.getElementById('modalResgate').classList.remove('open');
+    document.getElementById('modalResgate').style.display = 'none';
     recompensaAtual = null;
   }
 
@@ -177,10 +183,11 @@
     try {
       const data = await apiFetch('/api/recompensas/resgatar', {
         method: 'POST',
-        body: { funcionario_nome: nome, recompensa_id: recompensaAtual.id }
+        body: { funcionario_nome: nome, recompensa_id: recompensaAtual.id || recompensaAtual._id }
       });
       fecharModal();
-      showAlert('🎉 ' + data.mensagem, 'success');
+      showAlert('🎉 ' + (data.mensagem || 'Solicitação enviada! Apresente-se ao líder do seu setor.'), 'success');
+      init(); // Recarrega saldo
     } catch (err) {
       showResgateAlert(err.message || 'Erro ao resgatar.', 'error');
     }
@@ -202,26 +209,56 @@
   }
 
   async function init() {
-    sessionData = await apiFetch('/api/me');
+    sessionData = await apiFetch('/api/me').catch(() => ({ logado: false }));
 
-    if (sessionData.logado && sessionData.tipo === 'setor') {
-      document.getElementById('navDash').style.display = '';
+    if (sessionData.logado) {
+      const navDash = document.getElementById('navDash');
+      navDash.style.display = '';
+      
+      if (sessionData.tipo === 'setor') {
+        navDash.href = 'dashboard.html';
+        navDash.textContent = 'Painel do Setor';
+        document.getElementById('saldoLabel').textContent = 'Pontos do Setor';
+      } else if (sessionData.tipo === 'funcionario') {
+        navDash.href = 'user.html';
+        navDash.textContent = 'Meu Perfil';
+        document.getElementById('saldoLabel').textContent = 'Meus Pontos';
+      } else if (sessionData.tipo === 'admin') {
+        navDash.href = 'admin.html';
+        navDash.textContent = 'Admin';
+      }
+
       document.getElementById('saldoInfo').style.display = 'block';
       document.getElementById('navActions').innerHTML = `<button onclick="apiFetch('/api/auth/logout',{method:'POST'}).then(()=>location.href='/login.html')" class="btn btn-secondary btn-sm">Sair</button>`;
 
-      // Calcular saldo pessoal (sem nome definido ainda — mostrará quando resgatar)
-      // Calcular saldo do setor
+      // Buscar saldos
       try {
-        const ranking = await apiFetch('/api/ranking/setores');
-        const meuSetor = ranking.find(s => s.id === sessionData.setor.id);
-        saldoSetor = meuSetor ? meuSetor.total_pontos : 0;
-        document.getElementById('saldoAtual').textContent = saldoSetor.toLocaleString();
-      } catch {}
+        if (sessionData.tipo === 'funcionario') {
+          const rankingFunc = await apiFetch('/api/ranking/funcionarios');
+          const eu = rankingFunc.find(f => f.funcionario_nome === sessionData.nome);
+          saldoUsuario = eu ? eu.total_pontos : 0;
+          document.getElementById('saldoAtual').textContent = saldoUsuario.toLocaleString();
+        }
+        
+        const rankingSetores = await apiFetch('/api/ranking/setores');
+        const meuSetorId = sessionData.setor_id || (sessionData.setor ? sessionData.setor.id : null);
+        const s = rankingSetores.find(s => s.id === meuSetorId || s._id === meuSetorId);
+        saldoSetor = s ? s.total_pontos : 0;
+        
+        if (sessionData.tipo === 'setor') {
+          document.getElementById('saldoAtual').textContent = saldoSetor.toLocaleString();
+        }
+      } catch(e) { console.error("Erro ao carregar saldos:", e); }
     }
 
     todasRecompensas = await apiFetch('/api/recompensas');
     renderRecompensas();
   }
+
+  // Fechar modal ao clicar fora
+  document.getElementById("modalResgate")?.addEventListener("click", (e) => {
+    if (e.target.id === "modalResgate") fecharModal();
+  });
 
   init();
 </script>

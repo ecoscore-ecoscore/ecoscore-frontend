@@ -17,6 +17,49 @@
     }
     .pontos-value { font-size: 3rem; font-weight: 900; color: var(--gold); line-height: 1; }
     .pontos-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem; }
+    
+    /* Buscador de Funcionários */
+    .search-wrapper { position: relative; margin-bottom: 1rem; }
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .search-results.active { display: block; }
+    .search-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: rgba(76, 175, 80, 0.1); }
+    .search-item .name { display: block; font-weight: 700; color: var(--text); }
+    .search-item .meta { display: block; font-size: 0.75rem; color: var(--text-dim); }
+    
+    .selected-func {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(76, 175, 80, 0.08);
+      border: 1.5px solid var(--green-500);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+    .selected-func .icon { font-size: 1.5rem; }
+    .selected-func .info { flex: 1; }
+    .selected-func .remove { cursor: pointer; color: var(--text-dim); font-size: 1.2rem; }
+
     .success-overlay {
       display: none;
       position: fixed;
@@ -59,7 +102,7 @@
   <div class="page-header-inner">
     <div>
       <h1 class="page-title">📝 Registrar Coleta</h1>
-      <p class="page-desc" id="headerDesc">Informe os dados do material reciclado</p>
+      <p class="page-desc" id="headerDesc">Selecione o funcionário e os dados do material</p>
     </div>
     <div id="statusDia"></div>
   </div>
@@ -94,9 +137,27 @@
         <form id="formColeta" onsubmit="registrar(event)">
 
           <div class="form-group">
-            <label class="form-label" for="funcionarioNome">👤 Nome do Funcionário</label>
-            <input id="funcionarioNome" class="form-control" type="text" placeholder="Seu nome completo" required autocomplete="name" list="funcionariosList">
-            <datalist id="funcionariosList"></datalist>
+            <label class="form-label">👤 Selecionar Funcionário</label>
+            
+            <!-- Campo de Selecionado -->
+            <div id="areaSelecionado" style="display:none">
+              <div class="selected-func">
+                <span class="icon">👤</span>
+                <div class="info">
+                  <span class="name" id="nomeSelecionado"></span>
+                  <span class="meta" id="setorSelecionado" style="font-size:0.75rem;color:var(--text-dim)"></span>
+                </div>
+                <span class="remove" onclick="removerSelecao()">✕</span>
+              </div>
+            </div>
+
+            <!-- Campo de Busca -->
+            <div class="search-wrapper" id="areaBusca">
+              <input id="inputBusca" class="form-control" type="text" placeholder="Digite o nome para pesquisar..." autocomplete="off">
+              <div id="listaResultados" class="search-results"></div>
+            </div>
+            
+            <input type="hidden" id="funcionarioNome" required>
           </div>
 
           <div class="form-group">
@@ -149,6 +210,8 @@
 <script>
   const PONTOS = { metal: 10, vidro: 7, plastico: 5, papel: 3 };
   let materialSelecionado = null;
+  let todosFuncionarios = [];
+  let funcionarioSelecionado = null;
 
   function selectMaterial(material) {
     document.querySelectorAll('.material-card').forEach(c => c.classList.remove('selected'));
@@ -172,14 +235,67 @@
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // Lógica de Busca de Funcionários
+  const inputBusca = document.getElementById('inputBusca');
+  const listaResultados = document.getElementById('listaResultados');
+
+  inputBusca.oninput = () => {
+    const termo = inputBusca.value.toLowerCase().trim();
+    if (termo.length < 1) {
+      listaResultados.classList.remove('active');
+      return;
+    }
+
+    const filtrados = todosFuncionarios.filter(f => 
+      f.nome.toLowerCase().includes(termo) || 
+      f.setor.toLowerCase().includes(termo)
+    );
+
+    if (filtrados.length > 0) {
+      listaResultados.innerHTML = filtrados.map(f => `
+        <div class="search-item" onclick="selecionarFuncionario('${f.id}')">
+          <span class="name">${f.nome}</span>
+          <span class="meta">${f.setor}</span>
+        </div>
+      `).join('');
+      listaResultados.classList.add('active');
+    } else {
+      listaResultados.innerHTML = '<div class="search-item text-dim">Nenhum funcionário encontrado</div>';
+      listaResultados.classList.add('active');
+    }
+  };
+
+  function selecionarFuncionario(id) {
+    const f = todosFuncionarios.find(x => x.id === id);
+    if (!f) return;
+
+    funcionarioSelecionado = f;
+    document.getElementById('funcionarioNome').value = f.nome;
+    document.getElementById('nomeSelecionado').textContent = f.nome;
+    document.getElementById('setorSelecionado').textContent = f.setor;
+    
+    document.getElementById('areaBusca').style.display = 'none';
+    document.getElementById('areaSelecionado').style.display = 'block';
+    listaResultados.classList.remove('active');
+    inputBusca.value = '';
+  }
+
+  function removerSelecao() {
+    funcionarioSelecionado = null;
+    document.getElementById('funcionarioNome').value = '';
+    document.getElementById('areaBusca').style.display = 'block';
+    document.getElementById('areaSelecionado').style.display = 'none';
+    inputBusca.focus();
+  }
+
   async function registrar(e) {
     e.preventDefault();
 
-    const funcionario_nome = document.getElementById('funcionarioNome').value.trim();
+    const funcionario_nome = document.getElementById('funcionarioNome').value;
     const peso_kg = document.getElementById('pesoKg').value;
 
+    if (!funcionarioSelecionado) { showAlert('Selecione um funcionário da lista.', 'warning'); return; }
     if (!materialSelecionado) { showAlert('Selecione o tipo de material.', 'warning'); return; }
-    if (!funcionario_nome) { showAlert('Informe o nome do funcionário.', 'warning'); return; }
 
     const btn = document.getElementById('btnRegistrar');
     btn.disabled = true;
@@ -191,14 +307,10 @@
         method: 'POST',
         body: { funcionario_nome, tipo_material: materialSelecionado, peso_kg }
       });
-      document.getElementById('successMsg').textContent = `+${data.pontos} pontos conquistados! Continue assim!`;
+      document.getElementById('successMsg').textContent = `+${data.pontos} pontos para ${funcionario_nome}!`;
       document.getElementById('successOverlay').classList.add('show');
     } catch (err) {
-      if (err.status === 409) {
-        showAlert('⚠️ ' + err.message, 'warning');
-      } else {
-        showAlert(err.message || 'Erro ao registrar coleta.', 'error');
-      }
+      showAlert(err.message || 'Erro ao registrar coleta.', 'error');
     }
 
     btn.disabled = false;
@@ -208,10 +320,10 @@
   function novaColeta() {
     document.getElementById('successOverlay').classList.remove('show');
     document.getElementById('formColeta').reset();
+    removerSelecao();
     document.querySelectorAll('.material-card').forEach(c => c.classList.remove('selected'));
     materialSelecionado = null;
     document.getElementById('pontosVal').textContent = '0';
-    document.getElementById('funcionarioNome').focus();
   }
 
   async function init() {
@@ -223,7 +335,7 @@
     const setor = me.setor;
 
     document.getElementById('dataHoje').textContent = hoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('headerDesc').textContent = `Setor: ${setor.nome}`;
+    document.getElementById('headerDesc').textContent = `Ponto de Coleta: ${setor.nome}`;
 
     if (diaAtual !== setor.dia_semana) {
       const DIAS = ['', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
@@ -235,22 +347,25 @@
       document.getElementById('statusDia').innerHTML = `<div class="badge badge-green">✅ Coleta liberada</div>`;
     }
 
-    // Carregar sugestões de funcionários via ranking (nomes conhecidos)
+    // Carregar lista de funcionários da empresa
     try {
-      const ranking = await apiFetch('/api/ranking/funcionarios');
-      const dl = document.getElementById('funcionariosList');
-      ranking.filter(f => f.setor_nome === setor.nome).forEach(f => {
-        const opt = document.createElement('option');
-        opt.value = f.funcionario_nome;
-        dl.appendChild(opt);
-      });
-    } catch {}
+      todosFuncionarios = await apiFetch('/api/admin/funcionarios/list');
+    } catch (e) {
+      console.error("Erro ao carregar funcionários", e);
+    }
   }
 
   async function logout() {
     await apiFetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/login.html';
   }
+
+  // Fechar resultados ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrapper')) {
+      listaResultados.classList.remove('active');
+    }
+  });
 
   init();
 </script>
