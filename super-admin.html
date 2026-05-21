@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Master — EcoScore</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .modal-overlay { display: none; }
+    .modal-overlay.open { display: flex; }
+  </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <a href="/portal.html" class="navbar-brand">
+  <a href="/" class="navbar-brand">
     <span class="logo-icon">🌿</span>
     <div>
       <span class="logo-text">EcoScore Master</span>
@@ -17,6 +21,7 @@
     </div>
   </a>
   <div class="navbar-actions">
+    <button onclick="abrirModalAlterarSenha()" class="btn btn-secondary btn-sm">🔒 Alterar Minha Senha</button>
     <button onclick="logout()" class="btn btn-secondary btn-sm">Sair</button>
   </div>
 </nav>
@@ -82,6 +87,31 @@
   </div>
 </div>
 
+<!-- Modal Alterar Senha -->
+<div id="modalAlterarSenha" class="modal-overlay">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">🔒 Alterar Senha Master</h3>
+      <button class="modal-close" onclick="fecharModalAlterarSenha()">✕</button>
+    </div>
+    <form id="formAlterarSenha" onsubmit="handleAlterarSenha(event)" style="padding: 1.5rem;">
+      <div class="form-group">
+        <label class="form-label">Senha Atual</label>
+        <input type="password" id="senhaAtual" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nova Senha</label>
+        <input type="password" id="novaSenha" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar Nova Senha</label>
+        <input type="password" id="confirmarSenha" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">✅ Atualizar Senha Master</button>
+    </form>
+  </div>
+</div>
+
 <script src="/js/config.js"></script>
 <script>
   let empresasList = [];
@@ -109,12 +139,13 @@
           </td>
           <td style="font-size:0.8rem;color:var(--text-dim)">${new Date(e.data_cadastro).toLocaleDateString()}</td>
           <td>
-            <button class="btn btn-danger btn-sm" onclick="deletarEmpresa(${e.id})">🗑️</button>
+            <button class="btn btn-danger btn-sm" onclick="deletarEmpresa('${e.id}')">🗑️</button>
           </td>
         </tr>
       `).join('');
-    } catch {
-      window.location.href = '/login.html';
+    } catch (err) {
+      console.error("Erro ao carregar empresas:", err);
+      // window.location.href = '/login.html';
     }
   }
 
@@ -157,8 +188,8 @@
       await apiFetch(`/api/super/empresas/${id}`, { method: 'DELETE' });
       carregarEmpresas();
       showAlert('✅ Empresa removida do sistema.');
-    } catch {
-      showAlert('❌ Erro ao remover empresa.', 'error');
+    } catch (err) {
+      showAlert('❌ ' + err.message, 'error');
     }
   }
 
@@ -170,10 +201,34 @@
     setTimeout(() => box.style.display = 'none', 4000);
   }
 
+  function abrirModalAlterarSenha() { document.getElementById('modalAlterarSenha').classList.add('open'); }
+  function fecharModalAlterarSenha() { document.getElementById('modalAlterarSenha').classList.remove('open'); }
+
+  async function handleAlterarSenha(e) {
+    e.preventDefault();
+    const body = {
+      senhaAtual: document.getElementById('senhaAtual').value,
+      novaSenha: document.getElementById('novaSenha').value,
+      confirmarSenha: document.getElementById('confirmarSenha').value
+    };
+    try {
+      await apiFetch('/api/auth/alterar-senha', { method: 'POST', body });
+      showAlert('✅ Senha Master alterada com sucesso!');
+      fecharModalAlterarSenha();
+      document.getElementById('formAlterarSenha').reset();
+    } catch (err) {
+      alert('❌ ' + err.message);
+    }
+  }
+
   async function logout() {
     await apiFetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/login.html';
   }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', (e) => { if(e.target === m) m.classList.remove('open'); });
+  });
 
   carregarEmpresas();
 </script>
