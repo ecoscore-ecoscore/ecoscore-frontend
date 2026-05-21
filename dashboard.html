@@ -241,9 +241,9 @@
         const me = await apiFetch("/api/me");
         if (!me.logado || me.tipo !== "setor") { window.location.href = "/login.html"; return; }
 
-        document.getElementById("sectorName").textContent = `🏢 ${me.nome}`;
+        document.getElementById("sectorName").textContent = `🏢 ${me.nome || 'Setor'}`;
         document.getElementById("sectorDesc").textContent = `Dia oficial de coleta: ${DIAS[me.dia_semana]}`;
-        document.getElementById("navSetor").textContent = me.nome;
+        document.getElementById("navSetor").textContent = me.nome || 'Setor';
 
         const diaHoje = new Date().getDay();
         const liberado = diaHoje === me.dia_semana;
