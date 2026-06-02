@@ -1,0 +1,120 @@
+/* ─── EcoScore Header CSS ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --green-600: #43A047;
+  --green-500: #4CAF50;
+  --green-400: #66BB6A;
+  --gold:      #FFC107;
+  --dark:      #0D1F0F;
+  --border:    rgba(76, 175, 80, 0.2);
+  --text:      #F1F8E9;
+  --text-muted:#A5D6A7;
+  --radius-sm: 8px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  margin: 0;
+}
+
+/* Navbar LP (Specific to Landing Page) */
+.nav-lp {
+  background: rgba(13, 31, 15, 0.8);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 70px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Brand Styles */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+}
+.navbar-brand .logo-icon { font-size: 1.8rem; }
+.navbar-brand .logo-text { 
+  font-size: 1.4rem; 
+  font-weight: 800; 
+  background: linear-gradient(135deg, var(--green-400), var(--gold)); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+}
+
+/* Nav Links Styles */
+.nav-links-lp {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-links-lp a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+.nav-links-lp a:hover {
+  color: var(--green-400);
+  background: rgba(76, 175, 80, 0.1);
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.35);
+}
+
+.btn-primary:hover { 
+  box-shadow: 0 6px 24px rgba(76, 175, 80, 0.5); 
+  transform: translateY(-1px); 
+}
+
+.btn-sm { 
+  padding: 0.4rem 0.9rem; 
+  font-size: 0.8rem; 
+}
+
+/* Helper for the container in the header */
+.header-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
