@@ -1,0 +1,74 @@
+name: CI — Auto Tag & Release
+
+on:
+  push:
+    branches: [main]
+
+# Permissão para criar tags e releases
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    name: Bump version & create release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout completo (com histórico de tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Buscar todas as tags remotas
+        run: git fetch --tags --force
+
+      - name: Determinar última tag e calcular próxima versão
+        id: versao
+        run: |
+          # Pega a tag mais recente no formato vX.Y.Z
+          ULTIMA=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+
+          # Se não houver nenhuma tag, começa do zero
+          if [ -z "$ULTIMA" ]; then
+            ULTIMA="v1.0.0"
+            echo "⚠️  Nenhuma tag encontrada. Usando base: $ULTIMA"
+          else
+            echo "📌 Última tag encontrada: $ULTIMA"
+          fi
+
+          # Remove o 'v' e separa Major.Minor.Patch
+          VERSAO=${ULTIMA#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSAO"
+
+          # Incrementa o patch
+          PATCH=$((PATCH + 1))
+          NOVA_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+
+          echo "🚀 Nova versão: $NOVA_TAG"
+          echo "ultima=$ULTIMA"     >> $GITHUB_OUTPUT
+          echo "nova_tag=$NOVA_TAG" >> $GITHUB_OUTPUT
+
+      - name: Criar e publicar nova tag
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.versao.outputs.nova_tag }}" -m "Release ${{ steps.versao.outputs.nova_tag }}"
+          git push origin "${{ steps.versao.outputs.nova_tag }}"
+
+      - name: Criar GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.versao.outputs.nova_tag }}
+          name: "🌿 EcoScore Frontend ${{ steps.versao.outputs.nova_tag }}"
+          body: |
+            ## O que mudou
+
+            **Commit:** `${{ github.sha }}`
+            **Mensagem:** ${{ github.event.head_commit.message }}
+            **Autor:** ${{ github.event.head_commit.author.name }}
+            **Branch:** `${{ github.ref_name }}`
+
+            ---
+            *Release gerada automaticamente pelo GitHub Actions*
+          generate_release_notes: true
+          make_latest: true
