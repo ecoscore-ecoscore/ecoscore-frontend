@@ -15,21 +15,22 @@
 
 <!-- ══ NAVBAR ══════════════════════════════════════════════════════════ -->
 <nav class="nav-lp">
-  <a href="/" class="navbar-brand">
-    <span class="logo-icon">🌿</span>
-    <span class="logo-text">EcoScore</span>
-  </a>
+  <div class="nav-lp-inner">
+    <a href="/" class="navbar-brand">
+      <img src="/img/logo.png" alt="EcoScore" class="logo-img" style="background-color: transparent" />
+    </a>
 
-  <ul class="nav-links-lp">
-    <li><a href="#sobre">Como Funciona</a></li>
-    <li><a href="#sustentabilidade">Sustentabilidade</a></li>
-    <li><a href="#calendario">Setores</a></li>
-    <li><a href="ranking.html">Ranking</a></li>
-    <li><a href="recompensas.html">Recompensas</a></li>
-  </ul>
+    <ul class="nav-links-lp">
+      <li><a href="#sobre">Como Funciona</a></li>
+      <li><a href="#sustentabilidade">Sustentabilidade</a></li>
+      <li><a href="#calendario">Setores</a></li>
+      <li><a href="ranking.html">Ranking</a></li>
+      <li><a href="recompensas.html">Recompensas</a></li>
+    </ul>
 
-  <div class="header-actions">
-    <a href="login.html" class="btn btn-primary btn-sm" id="btnLogin">🔑 Entrar</a>
+    <div class="header-actions">
+      <a href="login.html" class="btn btn-primary btn-sm" id="btnLogin">🔑 Entrar</a>
+    </div>
   </div>
 </nav>
 
@@ -37,8 +38,12 @@
 <section class="hero">
   <!-- Texto centralizado -->
   <div class="hero-text-area">
-    <div class="hero-logo">Eco<span>Score</span></div>
+    <!--
+    div class="hero-logo">Eco<span>Score</span></div>
     <p class="hero-tagline">Gestão Sustentável de Resíduos Recicláveis</p>
+    Logo no Hero-->
+    <img src="/img/logo.png" alt="EcoScore" class="logo-img" style="background-color: transparent; width: 20%; margin-top: 5%; margin-bottom: 10px;" />
+    
     <a href="#sobre" class="hero-btn">📖 Saiba Mais</a>
   </div>
 
@@ -503,20 +508,42 @@
 <footer class="footer">
   <div class="footer-inner">
     <div>
-      <div class="footer-brand-name">🌿 EcoScore</div>
-      <div class="footer-brand-sub">Sistema de Gestão de Resíduos Recicláveis por Setor</div>
+      <div class="footer-brand-name" style="text-align:center">
+        <img src="/img/logo.png" alt="EcoScore" class="logo-img" />
+      </div>
+      <p class="footer-brand-sub" style="text-align:center">Gestão Sustentável de Resíduos Recicláveis</p>
     </div>
-    <div class="footer-social">
-      <a href="#" class="social-btn">📘</a>
-      <a href="#" class="social-btn">📸</a>
-      <a href="#" class="social-btn">✉️</a>
-      <a href="#" class="social-btn">📞</a>
+    <div class="footer-contact">
+      <p class="footer-contact-text">
+        Entre em contato pelo e-mail:
+        <button type="button" class="footer-email-chip" onclick="copiarEmail(this)" title="Clique para copiar o e-mail">
+          <span class="chip-icon">✉️</span>
+          <span class="chip-email">ecoscore994@gmail.com</span>
+          <span class="chip-action">📋 Copiar</span>
+        </button>
+      </p>
     </div>
   </div>
   <div class="footer-copy">© 2024 EcoScore — Todos os direitos reservados. Sistema desenvolvido para a gestão sustentável corporativa.</div>
 </footer>
 
 <script>
+  function copiarEmail(btn) {
+    navigator.clipboard.writeText('ecoscore994@gmail.com').then(() => {
+      const chipAction = btn ? btn.querySelector('.chip-action') : null;
+      if (btn) btn.classList.add('copied');
+      if (chipAction) chipAction.textContent = '✅ Copiado!';
+      
+      setTimeout(() => {
+        if (btn) btn.classList.remove('copied');
+        if (chipAction) chipAction.textContent = '📋 Copiar';
+      }, 2500);
+    }).catch(() => {
+      const chipAction = btn ? btn.querySelector('.chip-action') : null;
+      if (chipAction) chipAction.textContent = '✅ Copiado!';
+    });
+  }
+
   // Destacar o dia de hoje no calendário
   const HOJE = new Date().getDay(); // 0=Dom, 1=Seg...
   if (HOJE >= 1 && HOJE <= 5) {

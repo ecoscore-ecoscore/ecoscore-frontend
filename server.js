@@ -28,6 +28,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.set("trust proxy", 1); 
 
+const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
+
 // Configuração de Sessão (Agora muito mais segura por estar no mesmo domínio)
 app.use(
   session({
@@ -38,14 +40,14 @@ app.use(
     rolling: true,
     proxy: true,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI || "mongodb+srv://ecoscore994_db_user:rRW1AeLn6tpShP0i@ecoscore.bmqnwxt.mongodb.net/ecoscore?retryWrites=true&w=majority",
+      mongoUrl: process.env.MONGODB_URI || "mongodb://ecoscore994_db_user:rRW1AeLn6tpShP0i@ac-d7cmtim-shard-00-00.bmqnwxt.mongodb.net:27017,ac-d7cmtim-shard-00-01.bmqnwxt.mongodb.net:27017,ac-d7cmtim-shard-00-02.bmqnwxt.mongodb.net:27017/test?ssl=true&authSource=admin&replicaSet=atlas-9tb2p0-shard-0&retryWrites=true&w=majority",
       ttl: 14 * 24 * 60 * 60,
       touchAfter: 60
     }),
     cookie: {
       httpOnly: true,
-      secure: true,      
-      sameSite: "lax",   // Mudado de 'none' para 'lax' (Nível máximo de segurança para mesmo domínio)
+      secure: isProduction, // false em http localhost, true em HTTPS produção   
+      sameSite: "lax",   
       maxAge: 7 * 24 * 60 * 60 * 1000, 
     },
   }),

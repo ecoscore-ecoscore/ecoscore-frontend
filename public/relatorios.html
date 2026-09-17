@@ -15,12 +15,8 @@
 <body>
 
 <nav class="navbar">
-  <a href="/" class="navbar-brand">
-    <span class="logo-icon">🌿</span>
-    <div>
-      <span class="logo-text">EcoScore</span>
-      <span class="logo-sub">Gestão Sustentável de Resíduos</span>
-    </div>
+  <a href="admin.html" class="navbar-brand">
+    <img src="/img/logo.png" alt="EcoScore" class="logo-img" />
   </a>
   <ul class="navbar-nav">
     <li><a href="admin.html">⚙️ Admin</a></li>
@@ -171,7 +167,7 @@
           <tr>
             <td>${medal[i] || '#' + (i + 1)}</td>
             <td style="font-weight:600">${f.funcionario_nome}</td>
-            <td>${f.setor_nome}</td>
+            <td>${f.setor_nome || 'Sem setor'}</td>
             <td><span class="badge badge-green">${f.total_kg.toFixed(1)}kg</span></td>
             <td><span class="badge badge-gold">${f.total_pontos.toLocaleString()} pts</span></td>
           </tr>

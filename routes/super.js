@@ -16,7 +16,7 @@ function authSuper(req, res, next) {
 router.get('/empresas', authSuper, async (req, res) => {
   try {
     const empresas = await Empresa.aggregate([
-      { $lookup: { from: 'setores', localField: '_id', foreignField: 'empresa_id', as: 'setores' } },
+      { $lookup: { from: Setor.collection.name, localField: '_id', foreignField: 'empresa_id', as: 'setores' } },
       { $lookup: { from: 'funcionarios', localField: '_id', foreignField: 'empresa_id', as: 'funcionarios' } },
       { $project: {
           id: "$_id",

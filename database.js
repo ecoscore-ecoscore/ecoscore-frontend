@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
-// Configurações de conexão
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://ecoscore994_db_user:rRW1AeLn6tpShP0i@ecoscore.bmqnwxt.mongodb.net/ecoscore?retryWrites=true&w=majority";
+const DEFAULT_MONGODB_URI = "mongodb://ecoscore994_db_user:rRW1AeLn6tpShP0i@ac-d7cmtim-shard-00-00.bmqnwxt.mongodb.net:27017,ac-d7cmtim-shard-00-01.bmqnwxt.mongodb.net:27017,ac-d7cmtim-shard-00-02.bmqnwxt.mongodb.net:27017/test?ssl=true&authSource=admin&replicaSet=atlas-9tb2p0-shard-0&retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
 // Opções de conexão recomendadas para MongoDB Atlas + Serverless
 const connectionOptions = {

@@ -105,12 +105,8 @@
   </head>
   <body>
     <nav class="navbar">
-      <a href="/" class="navbar-brand">
-        <span class="logo-icon">🌿</span>
-        <div>
-          <span class="logo-text">EcoScore</span>
-          <span class="logo-sub">Gestão do Setor</span>
-        </div>
+      <a href="dashboard.html" class="navbar-brand">
+        <img src="/img/logo.png" alt="EcoScore" class="logo-img" />
       </a>
       <div class="navbar-actions">
         <span id="navSetor" style="font-size: 0.85rem; color: var(--text-muted)"></span>
@@ -265,8 +261,8 @@
           const coletas = await apiFetch("/api/coletas");
           const hoje = new Date().toISOString().split("T")[0];
           const coletasHoje = coletas.filter((c) => c.data_registro === hoje);
-          const totalKg = coletas.reduce((s, c) => s + c.weight_kg || c.peso_kg || 0, 0);
-          const totalPontos = coletas.reduce((s, c) => s + c.pontos, 0);
+          const totalKg = coletas.reduce((s, c) => s + (Number(c.peso_kg) || Number(c.weight_kg) || 0), 0);
+          const totalPontos = coletas.reduce((s, c) => s + (Number(c.pontos) || 0), 0);
           const funcionariosUnicos = new Set(coletas.map((c) => c.funcionario_nome)).size;
 
           document.getElementById("statColetas").textContent = coletasHoje.length;

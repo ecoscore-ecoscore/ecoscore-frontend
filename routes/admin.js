@@ -177,10 +177,10 @@ router.get('/relatorios', authAdmin, async (req, res) => {
           total_kg: { $sum: "$peso_kg" },
           total_pontos: { $sum: "$pontos" }
       }},
-      { $lookup: { from: 'setores', localField: '_id.setor', foreignField: '_id', as: 'setor' } },
+      { $lookup: { from: Setor.collection.name, localField: '_id.setor', foreignField: '_id', as: 'setor' } },
       { $project: {
           funcionario_nome: "$_id.nome",
-          setor_nome: { $arrayElemAt: ["$setor.nome", 0] },
+          setor_nome: { $ifNull: [{ $arrayElemAt: ["$setor.nome", 0] }, "Sem setor"] },
           total_kg: 1,
           total_pontos: 1
       }},
